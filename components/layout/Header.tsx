@@ -13,11 +13,13 @@ export default function Header() {
             <button className="md:hidden p-2 -ml-2 text-gray-500">
               <Menu size={22} />
             </button>
-            <Link 
-              href="/" 
-              className="font-serif text-2xl font-bold text-pink-900 tracking-wide cursor-pointer hover:text-pink-700 transition-colors"
+            <Link
+              href="/"
+              aria-label="Kagitacraft."
+              className="cursor-pointer tracking-wide hover:text-pink-700 transition-colors text-pink-900"
             >
-              Kagitacraft<span className="text-pink-400">.</span>
+              <span aria-hidden className="logo-anim" />
+              <span className="text-pink-400">.</span>
             </Link>
           </div>
 

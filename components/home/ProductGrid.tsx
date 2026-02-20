@@ -1,4 +1,10 @@
+"use client"
+
 import ProductCard from "@/components/ui/ProductCard";
+
+type Props = {
+  filterCategory?: string;
+};
 
 // Temporary mock data - will be replaced with API call
 const products = [
@@ -92,21 +98,24 @@ const products = [
   }
 ];
 
-export default function ProductGrid() {
+export default function ProductGrid({ filterCategory }: Props) {
+  const shown = filterCategory && filterCategory !== 'all'
+    ? products.filter((p) => p.category === filterCategory)
+    : products;
+
   return (
     <div>
       <div className="flex justify-between items-end mb-6 px-2">
         <div>
           <h3 className="font-serif text-2xl text-gray-800">Katalog Pilihan</h3>
           <p className="text-xs text-gray-400 mt-1">
-            Menampilkan {products.length} produk
+            Menampilkan {shown.length} produk
           </p>
         </div>
       </div>
 
-      {/* Grid: 2 cols mobile, 3 cols tablet, 4 cols desktop */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-8">
-        {products.map((product) => (
+        {shown.map((product) => (
           <ProductCard key={product.id} product={product} />
         ))}
       </div>
