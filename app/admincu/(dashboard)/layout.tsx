@@ -1,3 +1,4 @@
+"use client";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { getAdminSession } from "@/lib/auth";
