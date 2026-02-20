@@ -8,21 +8,21 @@ export default function Navigation() {
   
   return (
     <div className="hidden md:flex items-center gap-8 text-sm font-medium text-gray-500">
-      <Link 
-        href="/" 
-        className={`hover:text-pink-600 transition-colors ${pathname === '/' ? 'text-pink-600' : ''}`}
+      <Link
+        href="/"
+        className={`neumorphic-btn hover:text-pink-600 ${pathname === '/' ? 'neumorphic-active' : ''}`}
       >
         Beranda
       </Link>
-      <Link 
-        href="/katalog" 
-        className={`hover:text-pink-600 transition-colors ${pathname === '/katalog' ? 'text-pink-600' : ''}`}
+      <Link
+        href="/katalog"
+        className={`neumorphic-btn hover:text-pink-600 ${pathname === '/katalog' ? 'neumorphic-active' : ''}`}
       >
         Katalog
       </Link>
-      <Link 
-        href="/tentang-kami" 
-        className={`hover:text-pink-600 transition-colors ${pathname === '/tentang-kami' ? 'text-pink-600' : ''}`}
+      <Link
+        href="/tentang-kami"
+        className={`neumorphic-btn hover:text-pink-600 ${pathname === '/tentang-kami' ? 'neumorphic-active' : ''}`}
       >
         Tentang Kami
       </Link>
