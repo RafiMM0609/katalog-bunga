@@ -1,0 +1,103 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 0 0% 3.9%;
+  }
+  
+  body {
+    @apply bg-[#FFF0F5] text-gray-700;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+@layer utilities {
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .animate-fade-in {
+    animation: fadeIn 0.5s ease-in-out;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Animated monospace logo (vertical scrub frames) */
+  .logo-anim {
+    display: inline-block;
+    font-weight: 700;
+    font-family: var(--font-jet-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
+    white-space: pre;
+    font-size: 30px;
+    line-height: 1.2em;
+    height: 1.2em;
+    overflow: hidden;
+  }
+
+  .logo-anim::before {
+    /* 12 frames: char-by-char transform from 'Kagitacraft' → 'welcomehere' */
+    content: "Kagitacraft\Awagitacraft\Awegitacraft\Awelitacraft\Awelctacraft\Awelcoacraft\Awelcomcraft\Awelcomeraft\Awelcomehaft\Awelcomeheft\Awelcomehert\Awelcomehere";
+    white-space: pre;
+    display: inline-block;
+    animation: logoScrub 2s steps(12) infinite alternate;
+    color: currentColor;
+  }
+
+  @keyframes logoScrub {
+    100% {
+      transform: translateY(-100%);
+    }
+  }
+}
+
+@layer components {
+  .neumorphic-btn {
+    @apply inline-flex items-center justify-center text-gray-900 px-5 py-2.5 text-base rounded-md bg-[#f1f1f1] border border-[#e8e8e8] transition-transform duration-200;
+    box-shadow: 4px 4px 10px #cfcfcf, -4px -4px 10px #ffffff;
+  }
+
+  .neumorphic-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 6px 6px 14px #cfcfcf, -6px -6px 14px #ffffff;
+  }
+
+  .neumorphic-btn:active,
+  .neumorphic-btn.neumorphic-active {
+    color: #db2777; /* pink-600 */
+    box-shadow: inset 3px 3px 8px #cfcfcf, inset -3px -3px 8px #ffffff;
+  }
+  
+  .neumorphic-circle {
+    @apply inline-flex items-center justify-center rounded-full bg-[#f1f1f1] text-gray-900 border border-[#e8e8e8] transition-transform duration-200;
+    box-shadow: 4px 4px 10px #cfcfcf, -4px -4px 10px #ffffff;
+  }
+
+  .neumorphic-circle:hover {
+    transform: translateY(-2px);
+    box-shadow: 6px 6px 14px #cfcfcf, -6px -6px 14px #ffffff;
+  }
+
+  .neumorphic-circle:active,
+  .neumorphic-circle.neumorphic-active {
+    color: #ffffff;
+    background: #ec4899; /* pink-500 */
+    box-shadow: inset 3px 3px 8px #cfcfcf, inset -3px -3px 8px #ffffff;
+  }
+}
