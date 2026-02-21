@@ -14,8 +14,7 @@ export default function InterceptedProductModal() {
     const fetchProduct = async () => {
       try {
         const productId = params.id as string;
-        const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000/api/v1';
-        const res = await fetch(`${baseUrl}/produk/${productId}`);
+        const res = await fetch(`/api/v1/produk/${productId}`);
         if (res.ok) {
           const data = await res.json();
           setProduct(data);

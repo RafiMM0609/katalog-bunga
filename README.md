@@ -29,6 +29,7 @@ Copy `.env.local` and update the values:
 
 ```env
 DATABASE_URL=postgresql://user:password@localhost:5432/kagitacraft_db
+# Local development only. In production prefer relative `/api` paths or set a production API URL.
 NEXT_PUBLIC_API_BASE_URL=http://localhost:3000/api/v1
 NEXT_PUBLIC_WHATSAPP_ADMIN_NUMBER=6281234567890
 ADMIN_SECRET_KEY=your-secret-key
@@ -131,6 +132,8 @@ npm run dev
 
 ### Test API
 ```bash
+# Local development: API endpoints available at http://localhost:3000
+# Use relative paths when calling from the app (e.g. `/api/v1/produk`).
 # Products
 curl http://localhost:3000/api/v1/produk
 

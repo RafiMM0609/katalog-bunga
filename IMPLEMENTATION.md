@@ -183,13 +183,13 @@ e:\web-katalog/
 ```
 
 ### Access Points
-- **Home:** http://localhost:3000
+- **Home:** http://localhost:3000 (local dev)
 - **Product Detail Modal:** Click any product card
-- **Product Full Page:** http://localhost:3000/produk/1
+- **Product Full Page:** http://localhost:3000/produk/1 (local dev)
 - **About:** http://localhost:3000/tentang-kami
 - **Catalog:** http://localhost:3000/katalog
-- **API Products:** http://localhost:3000/api/v1/produk
-- **API Categories:** http://localhost:3000/api/v1/kategori
+- **API Products:** http://localhost:3000/api/v1/produk (local dev)
+- **API Categories:** http://localhost:3000/api/v1/kategori (local dev)
 
 ---
 

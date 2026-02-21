@@ -417,6 +417,7 @@ DATABASE_URL=postgresql://user:password@localhost:5432/kagitacraft_db
 # or MySQL: mysql://user:password@localhost:3306/kagitacraft_db
 
 # API
+# Local development only. Use relative `/api` paths in production or set a production API URL.
 NEXT_PUBLIC_API_BASE_URL=http://localhost:3000/api/v1
 
 # WhatsApp
@@ -453,6 +454,7 @@ File rendered: (.)produk/[id]/@modal/page.tsx
 
 **Scenario 2: User direct access via URL or refresh**
 ```
+# (local development example)
 http://localhost:3000/produk/123
 → URL doesn't match interceptor pattern
 → Next.js renders full page

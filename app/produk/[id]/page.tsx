@@ -2,8 +2,7 @@ import { notFound } from 'next/navigation';
 import ProductDetailServer from '@/components/product/ProductDetailServer';
 
 async function getProduct(id: string) {
-  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000/api/v1';
-  const res = await fetch(`${baseUrl}/produk/${id}`, {
+  const res = await fetch(`/api/v1/produk/${id}`, {
     cache: 'no-store', // For dynamic data
   });
 
