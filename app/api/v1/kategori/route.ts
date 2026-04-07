@@ -1,23 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
-
-const categories = [
-  { id: 1, name: 'Wisuda', slug: 'wisuda', icon_name: 'GraduationCap', description: 'Buket untuk wisuda' },
-  { id: 2, name: 'Guru', slug: 'guru', icon_name: 'BookOpen', description: 'Hadiah untuk guru' },
-  { id: 3, name: 'Ultah', slug: 'ultah', icon_name: 'Gift', description: 'Kado ulang tahun' },
-  { id: 4, name: 'Nikahan', slug: 'nikah', icon_name: 'Heart', description: 'Buket pernikahan' },
-  { id: 5, name: 'Anniv', slug: 'aniv', icon_name: 'Calendar', description: 'Anniversary' },
-  { id: 6, name: 'Kado', slug: 'kado', icon_name: 'ShoppingBag', description: 'Kado spesial' },
-];
+import { supabase } from '@/lib/supabase';
 
 // GET /api/v1/kategori - List all categories
 export async function GET(request: NextRequest) {
   try {
-    return NextResponse.json(categories);
+    const { data, error } = await supabase
+      .from('categories')
+      .select('*')
+      .order('name', { ascending: true });
+
+    if (error) throw error;
+
+    return NextResponse.json(data ?? []);
   } catch (error) {
-    return NextResponse.json(
-      { error: 'Failed to fetch categories' },
-      { status: 500 }
-    );
+    console.error('GET /api/v1/kategori error:', error);
+    return NextResponse.json({ error: 'Failed to fetch categories' }, { status: 500 });
   }
 }
 
@@ -25,23 +22,23 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    
-    // TODO: Add authentication check
-    // TODO: Validate request body
-    // TODO: Insert into database
-    
-    const newCategory = {
-      id: categories.length + 1,
-      ...body,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    };
 
-    return NextResponse.json(newCategory, { status: 201 });
+    const { data, error } = await supabase
+      .from('categories')
+      .insert({
+        name: body.name,
+        slug: body.slug || body.name.toLowerCase().replace(/\s+/g, '-'),
+        icon_name: body.icon_name || 'Gift',
+        description: body.description || null,
+      })
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    return NextResponse.json(data, { status: 201 });
   } catch (error) {
-    return NextResponse.json(
-      { error: 'Failed to create category' },
-      { status: 500 }
-    );
+    console.error('POST /api/v1/kategori error:', error);
+    return NextResponse.json({ error: 'Failed to create category' }, { status: 500 });
   }
 }

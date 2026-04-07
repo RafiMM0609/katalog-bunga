@@ -1,10 +1,9 @@
 import { SignJWT, jwtVerify } from 'jose';
 import { cookies } from 'next/headers';
 import bcrypt from 'bcryptjs';
+import { authConfig } from './config';
 
-const JWT_SECRET = new TextEncoder().encode(
-  process.env.ADMIN_SECRET_KEY || 'default-secret-key'
-);
+const JWT_SECRET = new TextEncoder().encode(authConfig.jwtSecret);
 
 export interface AdminSession {
   username: string;
@@ -48,7 +47,7 @@ export async function createAdminToken(username: string): Promise<string> {
   const token = await new SignJWT({ username, isAdmin: true })
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
-    .setExpirationTime('24h')
+    .setExpirationTime(authConfig.tokenExpiry)
     .sign(JWT_SECRET);
 
   return token;
@@ -74,7 +73,7 @@ export async function verifyAdminToken(
  */
 export async function getAdminSession(): Promise<AdminSession | null> {
   const cookieStore = await cookies();
-  const token = cookieStore.get('admin_token')?.value;
+  const token = cookieStore.get(authConfig.cookieName)?.value;
 
   if (!token) {
     return null;
@@ -90,11 +89,11 @@ export async function setAdminSession(username: string): Promise<void> {
   const token = await createAdminToken(username);
   const cookieStore = await cookies();
   
-  cookieStore.set('admin_token', token, {
+  cookieStore.set(authConfig.cookieName, token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
-    maxAge: 60 * 60 * 24, // 24 hours
+    maxAge: authConfig.cookieMaxAge,
     path: '/',
   });
 }
@@ -104,7 +103,7 @@ export async function setAdminSession(username: string): Promise<void> {
  */
 export async function clearAdminSession(): Promise<void> {
   const cookieStore = await cookies();
-  cookieStore.delete('admin_token');
+  cookieStore.delete(authConfig.cookieName);
 }
 
 /**

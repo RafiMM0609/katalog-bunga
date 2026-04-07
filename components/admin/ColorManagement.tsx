@@ -16,33 +16,65 @@ export default function ColorManagement() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Using existing paper colors from initial data
-    setColors([
-      { id: 1, name: 'Pink Pastel', hex_code: '#FBCFE8' },
-      { id: 2, name: 'Cream', hex_code: '#FDE68A' },
-      { id: 3, name: 'Silver', hex_code: '#E5E7EB' },
-      { id: 4, name: 'Putih', hex_code: '#FFFFFF' },
-      { id: 5, name: 'Hitam', hex_code: '#1F2937' },
-      { id: 6, name: 'Lilac', hex_code: '#E9D5FF' },
-    ]);
-    setLoading(false);
+    fetchColors();
   }, []);
 
-  const addColor = () => {
+  const fetchColors = async () => {
+    try {
+      const res = await fetch('/api/v1/paper-colors');
+      if (res.ok) {
+        const data = await res.json();
+        setColors(data);
+      } else {
+        toast.error('Gagal memuat warna');
+      }
+    } catch (error) {
+      toast.error('Gagal memuat warna');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const addColor = async () => {
     if (!newColor.name.trim()) {
       toast.error('Nama warna tidak boleh kosong');
       return;
     }
 
-    const newId = colors.length > 0 ? Math.max(...colors.map(c => c.id)) + 1 : 1;
-    setColors([...colors, { ...newColor, id: newId }]);
-    setNewColor({ name: '', hex_code: '#000000' });
-    toast.success('Warna berhasil ditambahkan');
+    try {
+      const res = await fetch('/api/v1/paper-colors', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newColor),
+      });
+
+      if (res.ok) {
+        toast.success('Warna berhasil ditambahkan');
+        setNewColor({ name: '', hex_code: '#000000' });
+        fetchColors();
+      } else {
+        toast.error('Gagal menambahkan warna');
+      }
+    } catch (error) {
+      toast.error('Terjadi kesalahan');
+    }
   };
 
-  const deleteColor = (id: number) => {
-    setColors(colors.filter(c => c.id !== id));
-    toast.success('Warna berhasil dihapus');
+  const deleteColor = async (id: number) => {
+    try {
+      const res = await fetch(`/api/v1/paper-colors/${id}`, {
+        method: 'DELETE',
+      });
+
+      if (res.ok) {
+        toast.success('Warna berhasil dihapus');
+        fetchColors();
+      } else {
+        toast.error('Gagal menghapus warna');
+      }
+    } catch (error) {
+      toast.error('Terjadi kesalahan');
+    }
   };
 
   if (loading) {

@@ -1,3 +1,5 @@
+import { siteConfig } from './config';
+
 /**
  * Utility function to send WhatsApp message
  */
@@ -6,7 +8,7 @@ export function sendWhatsAppMessage(
   paperColor: string,
   additionalNotes?: string
 ) {
-  const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_ADMIN_NUMBER || '6281234567890';
+  const whatsappNumber = siteConfig.whatsappNumber;
   
   let message = `Halo Admin Kagitacraft, saya tertarik dengan produk *${productName}*.\n\n`;
   message += `Detail Pilihan:\n`;
@@ -59,6 +61,5 @@ export function parseTags(tags?: string): string[] {
  * Generate canonical URL
  */
 export function getCanonicalUrl(path: string): string {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://kagitacraft.com';
-  return `${baseUrl}${path}`;
+  return `${siteConfig.url}${path}`;
 }
