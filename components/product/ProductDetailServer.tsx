@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Heart, MessageCircle, Star, MessageSquare, Phone, User, FileText, X } from 'lucide-react';
 import ColorPicker from '@/components/ui/ColorPicker';
 import RatingStars from '@/components/ui/RatingStars';
+import { siteConfig } from '@/lib/config';
 import type { PaperColor } from '@/lib/types';
 
 interface Product {
@@ -70,7 +71,7 @@ export default function ProductDetailServer({ product }: ProductDetailServerProp
       setSubmitting(false);
     }
 
-    const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_ADMIN_NUMBER || '6281234567890';
+    const whatsappNumber = siteConfig.whatsappNumber;
     const message = `Halo Admin Kagitacraft, saya *${customerName.trim()}* tertarik dengan produk *${product.name}*.\n\nDetail Pilihan:\n- Warna Kertas: ${paperColor || '-'}\n- No HP: ${customerPhone.trim()}\n${notes.trim() ? `- Catatan: ${notes.trim()}\n` : ''}\nBoleh tolong info harga dan ongkirnya? Terima kasih.`;
     const encodedMessage = encodeURIComponent(message);
     window.open(`https://wa.me/${whatsappNumber}?text=${encodedMessage}`, '_blank');
