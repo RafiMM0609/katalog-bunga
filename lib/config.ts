@@ -22,17 +22,17 @@ export const siteConfig = {
 
 // ===== ADMIN AUTH =====
 export const authConfig = {
-  jwtSecret: (() => {
+  get jwtSecret(): string {
     const secret = process.env.ADMIN_SECRET_KEY;
     if (!secret && process.env.NODE_ENV === 'production') {
       throw new Error('ADMIN_SECRET_KEY environment variable must be set in production');
     }
     return secret || 'default-secret-key';
-  })(),
+  },
   cookieName: 'admin_token',
   tokenExpiry: '24h',
   cookieMaxAge: 60 * 60 * 24, // 24 hours in seconds
-} as const;
+};
 
 // ===== IMAGE UPLOAD =====
 export const uploadConfig = {

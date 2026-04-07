@@ -3,7 +3,9 @@ import { cookies } from 'next/headers';
 import bcrypt from 'bcryptjs';
 import { authConfig } from './config';
 
-const JWT_SECRET = new TextEncoder().encode(authConfig.jwtSecret);
+function getJwtSecret() {
+  return new TextEncoder().encode(authConfig.jwtSecret);
+}
 
 export interface AdminSession {
   username: string;
@@ -48,7 +50,7 @@ export async function createAdminToken(username: string): Promise<string> {
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
     .setExpirationTime(authConfig.tokenExpiry)
-    .sign(JWT_SECRET);
+    .sign(getJwtSecret());
 
   return token;
 }
@@ -60,7 +62,7 @@ export async function verifyAdminToken(
   token: string
 ): Promise<AdminSession | null> {
   try {
-    const verified = await jwtVerify(token, JWT_SECRET);
+    const verified = await jwtVerify(token, getJwtSecret());
     const payload = verified.payload as unknown as AdminSession;
     return payload;
   } catch (error) {
