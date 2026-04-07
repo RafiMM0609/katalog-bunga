@@ -1,16 +1,19 @@
 import { notFound } from 'next/navigation';
+import { supabase } from '@/lib/supabase';
 import ProductDetailServer from '@/components/product/ProductDetailServer';
 
 async function getProduct(id: string) {
-  const res = await fetch(`/api/v1/produk/${id}`, {
-    cache: 'no-store', // For dynamic data
-  });
+  const { data, error } = await supabase
+    .from('products')
+    .select('*, category:categories(*)')
+    .eq('id', id)
+    .single();
 
-  if (!res.ok) {
+  if (error || !data) {
     notFound();
   }
 
-  return res.json();
+  return data;
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {

@@ -19,6 +19,7 @@ export interface Product {
   bg_color: string;
   icon_color: string;
   tags?: string;
+  image_url?: string;
   is_active: boolean;
   created_at: string;
   updated_at: string;

@@ -6,8 +6,9 @@ import TabNavigator from "@/components/admin/TabNavigator";
 import ProductManagement from "@/components/admin/ProductManagement";
 import CategoryManagement from "@/components/admin/CategoryManagement";
 import ColorManagement from "@/components/admin/ColorManagement";
+import OrderManagement from "@/components/admin/OrderManagement";
 
-type TabType = 'products' | 'categories' | 'colors';
+type TabType = 'products' | 'categories' | 'colors' | 'orders';
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState<TabType>('products');
@@ -22,7 +23,7 @@ export default function AdminDashboard() {
           Dashboard Admin
         </h1>
         <p className="text-sm text-gray-500">
-          Kelola produk, kategori, dan warna kertas Kagitacraft
+          Kelola produk, kategori, warna kertas, dan pesanan Kagitacraft
         </p>
       </div>
 
@@ -34,6 +35,7 @@ export default function AdminDashboard() {
         {activeTab === 'products' && <ProductManagement />}
         {activeTab === 'categories' && <CategoryManagement />}
         {activeTab === 'colors' && <ColorManagement />}
+        {activeTab === 'orders' && <OrderManagement />}
       </div>
     </div>
   );

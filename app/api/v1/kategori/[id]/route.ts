@@ -1,15 +1,12 @@
-import { NextResponse } from 'next/server';
-import { requireAdmin } from '@/lib/auth';
+import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 
-// DELETE - Delete category (admin only)
+// DELETE /api/v1/kategori/[id] - Delete category (admin only)
 export async function DELETE(
-  request: Request,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    await requireAdmin();
-
     const { id } = await params;
 
     const { error } = await supabase
@@ -22,11 +19,8 @@ export async function DELETE(
     }
 
     return NextResponse.json({ message: 'Category deleted successfully' });
-  } catch (error: any) {
-    if (error.message?.includes('Unauthorized')) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-    console.error('DELETE /api/v1/admin/kategori/[id] error:', error);
+  } catch (error) {
+    console.error('DELETE /api/v1/kategori/[id] error:', error);
     return NextResponse.json({ error: 'Failed to delete category' }, { status: 500 });
   }
 }

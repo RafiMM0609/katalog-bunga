@@ -1,8 +1,8 @@
 'use client'
 
-import { LayoutDashboard, Tags, Palette } from "lucide-react";
+import { LayoutDashboard, Tags, Palette, ShoppingBag } from "lucide-react";
 
-type TabType = 'products' | 'categories' | 'colors';
+type TabType = 'products' | 'categories' | 'colors' | 'orders';
 
 interface TabNavigatorProps {
   activeTab: TabType;
@@ -13,6 +13,7 @@ const tabs = [
   { id: 'products' as TabType, label: 'Produk', icon: LayoutDashboard },
   { id: 'categories' as TabType, label: 'Kategori', icon: Tags },
   { id: 'colors' as TabType, label: 'Warna Kertas', icon: Palette },
+  { id: 'orders' as TabType, label: 'Pesanan', icon: ShoppingBag },
 ];
 
 export default function TabNavigator({ activeTab, onTabChange }: TabNavigatorProps) {
