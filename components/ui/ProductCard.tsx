@@ -1,17 +1,6 @@
 import Link from "next/link";
 import { Heart, Star } from "lucide-react";
-
-interface Product {
-  id: number;
-  name: string;
-  category: string;
-  rating: number;
-  sold_count: number;
-  bg_color: string;
-  icon_color: string;
-  description: string;
-  tags: string;
-}
+import type { Product } from "@/lib/types";
 
 interface ProductCardProps {
   product: Product;
@@ -19,6 +8,11 @@ interface ProductCardProps {
 
 export default function ProductCard({ product }: ProductCardProps) {
   const tagsArray = product.tags ? product.tags.split(',').map(t => t.trim()) : [];
+  const categoryName = product.category
+    ? typeof product.category === 'string'
+      ? product.category
+      : product.category.name
+    : '';
 
   return (
     <Link href={`/produk/${product.id}`}>
@@ -53,7 +47,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         <div className="mt-4">
           <div className="flex items-center gap-1 mb-1">
             <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
-              {product.category}
+              {categoryName}
             </span>
             <span className="text-gray-300">•</span>
             <div className="flex items-center gap-0.5 text-[10px] text-yellow-500">

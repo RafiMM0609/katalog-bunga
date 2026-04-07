@@ -1,9 +1,10 @@
 'use client'
 
-import { useState } from 'react';
-import { X, Heart, MessageCircle, Star, MessageSquare } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { X, Heart, MessageCircle, Star, MessageSquare, Phone, User, FileText } from 'lucide-react';
 import ColorPicker from '@/components/ui/ColorPicker';
 import RatingStars from '@/components/ui/RatingStars';
+import type { PaperColor } from '@/lib/types';
 
 interface Product {
   id: number;
@@ -23,16 +24,58 @@ interface ProductDetailModalProps {
 }
 
 export default function ProductDetailModal({ product, onClose }: ProductDetailModalProps) {
-  const [paperColor, setPaperColor] = useState('Pink Pastel');
+  const [paperColor, setPaperColor] = useState('');
   const [userRating, setUserRating] = useState(0);
+  const [paperColors, setPaperColors] = useState<{ name: string; hex: string }[]>([]);
 
-  const handleOrder = () => {
+  // Order form state
+  const [showOrderForm, setShowOrderForm] = useState(false);
+  const [customerName, setCustomerName] = useState('');
+  const [customerPhone, setCustomerPhone] = useState('');
+  const [notes, setNotes] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    fetch('/api/v1/paper-colors')
+      .then((res) => res.ok ? res.json() : [])
+      .then((data: PaperColor[]) => {
+        if (data.length > 0) {
+          const mapped = data.map((c) => ({ name: c.name, hex: c.hex_code }));
+          setPaperColors(mapped);
+          setPaperColor(mapped[0].name);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  const handleOrderSubmit = async () => {
+    if (!customerName.trim() || !customerPhone.trim()) return;
+
+    setSubmitting(true);
+    try {
+      await fetch('/api/v1/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          customer_name: customerName.trim(),
+          customer_phone: customerPhone.trim(),
+          product_id: product.id,
+          selected_paper_color: paperColor || null,
+          customer_rating: userRating || null,
+          notes: notes.trim() || null,
+        }),
+      });
+    } catch {
+      // non-blocking: still open WhatsApp even if order recording fails
+    } finally {
+      setSubmitting(false);
+    }
+
     const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_ADMIN_NUMBER || '6281234567890';
-    const message = `Halo Admin Kagitacraft, saya tertarik dengan produk *${product.name}*.\n\nDetail Pilihan:\n- Warna Kertas: ${paperColor}\n\nBoleh tolong info harga dan ongkirnya? Terima kasih.`;
+    const message = `Halo Admin Kagitacraft, saya *${customerName.trim()}* tertarik dengan produk *${product.name}*.\n\nDetail Pilihan:\n- Warna Kertas: ${paperColor || '-'}\n- No HP: ${customerPhone.trim()}\n${notes.trim() ? `- Catatan: ${notes.trim()}\n` : ''}\nBoleh tolong info harga dan ongkirnya? Terima kasih.`;
     const encodedMessage = encodeURIComponent(message);
-    const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
-    
-    window.open(whatsappUrl, '_blank');
+    window.open(`https://wa.me/${whatsappNumber}?text=${encodedMessage}`, '_blank');
+    setShowOrderForm(false);
   };
 
   return (
@@ -109,12 +152,15 @@ export default function ProductDetailModal({ product, onClose }: ProductDetailMo
             </div>
 
             {/* Customization */}
-            <div className="mb-8">
-              <ColorPicker
-                selectedColor={paperColor}
-                onColorChange={setPaperColor}
-              />
-            </div>
+            {paperColors.length > 0 && (
+              <div className="mb-8">
+                <ColorPicker
+                  colors={paperColors}
+                  selectedColor={paperColor}
+                  onColorChange={setPaperColor}
+                />
+              </div>
+            )}
 
             {/* Rating Interaction */}
             <div className="mb-8 pt-6 border-t border-gray-100">
@@ -131,14 +177,63 @@ export default function ProductDetailModal({ product, onClose }: ProductDetailMo
               )}
             </div>
 
-            {/* Action Button */}
-            <button
-              onClick={handleOrder}
-              className="w-full bg-gray-800 text-white font-medium py-4 rounded-xl shadow-xl shadow-gray-200 hover:bg-pink-600 hover:shadow-pink-200 transition-all duration-300 flex items-center justify-center gap-3 transform hover:-translate-y-1"
-            >
-              <MessageCircle size={20} />
-              <span>Cek Harga & Pesan via WhatsApp</span>
-            </button>
+            {/* Order Form (inline) */}
+            {showOrderForm ? (
+              <div className="border border-pink-200 rounded-xl p-4 mb-4 bg-white space-y-3">
+                <div className="flex items-center justify-between mb-1">
+                  <p className="text-sm font-bold text-gray-700">Data Pemesan</p>
+                  <button onClick={() => setShowOrderForm(false)} className="text-gray-400 hover:text-red-500 transition-colors">
+                    <X size={18} />
+                  </button>
+                </div>
+                <div className="relative">
+                  <User size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                  <input
+                    type="text"
+                    placeholder="Nama Anda *"
+                    value={customerName}
+                    onChange={(e) => setCustomerName(e.target.value)}
+                    className="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-lg text-sm focus:border-pink-500 focus:ring-2 focus:ring-pink-200 outline-none"
+                  />
+                </div>
+                <div className="relative">
+                  <Phone size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                  <input
+                    type="tel"
+                    placeholder="No. HP / WhatsApp *"
+                    value={customerPhone}
+                    onChange={(e) => setCustomerPhone(e.target.value)}
+                    className="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-lg text-sm focus:border-pink-500 focus:ring-2 focus:ring-pink-200 outline-none"
+                  />
+                </div>
+                <div className="relative">
+                  <FileText size={16} className="absolute left-3 top-3 text-gray-400" />
+                  <textarea
+                    rows={2}
+                    placeholder="Catatan (opsional)"
+                    value={notes}
+                    onChange={(e) => setNotes(e.target.value)}
+                    className="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-lg text-sm focus:border-pink-500 focus:ring-2 focus:ring-pink-200 outline-none resize-none"
+                  />
+                </div>
+                <button
+                  onClick={handleOrderSubmit}
+                  disabled={submitting || !customerName.trim() || !customerPhone.trim()}
+                  className="w-full bg-gray-800 text-white font-medium py-3 rounded-xl shadow-lg hover:bg-pink-600 transition-all duration-300 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <MessageCircle size={20} />
+                  <span>{submitting ? 'Memproses...' : 'Lanjut ke WhatsApp'}</span>
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => setShowOrderForm(true)}
+                className="w-full bg-gray-800 text-white font-medium py-4 rounded-xl shadow-xl shadow-gray-200 hover:bg-pink-600 hover:shadow-pink-200 transition-all duration-300 flex items-center justify-center gap-3 transform hover:-translate-y-1"
+              >
+                <MessageCircle size={20} />
+                <span>Cek Harga & Pesan via WhatsApp</span>
+              </button>
+            )}
           </div>
         </div>
       </div>

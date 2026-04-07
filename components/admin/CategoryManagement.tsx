@@ -44,7 +44,7 @@ export default function CategoryManagement() {
 
     try {
       const slug = newCatName.toLowerCase().replace(/\s+/g, '-');
-      const res = await fetch('/api/v1/kategori', {
+      const res = await fetch('/api/v1/admin/kategori', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -68,7 +68,7 @@ export default function CategoryManagement() {
 
   const deleteCategory = async (id: number | string) => {
     try {
-      const res = await fetch(`/api/v1/kategori/${id}`, {
+      const res = await fetch(`/api/v1/admin/kategori/${id}`, {
         method: 'DELETE',
       });
 

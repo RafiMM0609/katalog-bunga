@@ -1,107 +1,50 @@
 "use client"
 
+import { useState, useEffect, useCallback } from "react";
 import ProductCard from "@/components/ui/ProductCard";
+import type { Product, PaginatedResponse } from "@/lib/types";
 
 type Props = {
   filterCategory?: string;
 };
 
-// Temporary mock data - will be replaced with API call
-const products = [
-  {
-    id: 1,
-    name: "Rosie Pink Elegance",
-    category: "wisuda",
-    rating: 4.9,
-    sold_count: 120,
-    bg_color: "bg-white",
-    icon_color: "text-pink-300",
-    description: "Buket mawar satin premium dengan nuansa soft pink yang manis. Pilihan sempurna untuk merayakan kelulusan dengan anggun.",
-    tags: "Best Seller"
-  },
-  {
-    id: 2,
-    name: "Teacher's Appreciation",
-    category: "guru",
-    rating: 5.0,
-    sold_count: 45,
-    bg_color: "bg-orange-50",
-    icon_color: "text-orange-200",
-    description: "Bunga matahari sintetis mini sebagai tanda terima kasih yang tulus untuk pahlawan tanpa tanda jasa.",
-    tags: "Favorit Guru"
-  },
-  {
-    id: 3,
-    name: "Sweet 17th Blush",
-    category: "ultah",
-    rating: 4.8,
-    sold_count: 88,
-    bg_color: "bg-purple-50",
-    icon_color: "text-purple-200",
-    description: "Kombinasi warna lilac dan pink muda yang dreamy. Ukuran besar (L) untuk momen spesial sweet seventeen.",
-    tags: "Promo"
-  },
-  {
-    id: 4,
-    name: "Eternal White Love",
-    category: "nikah",
-    rating: 5.0,
-    sold_count: 12,
-    bg_color: "bg-gray-50",
-    icon_color: "text-gray-300",
-    description: "Kemewahan bunga mawar putih bersih yang melambangkan ketulusan. Tahan selamanya, seperti janji suci.",
-    tags: "Premium"
-  },
-  {
-    id: 5,
-    name: "Anniversary Bloom Box",
-    category: "aniv",
-    rating: 4.7,
-    sold_count: 230,
-    bg_color: "bg-rose-50",
-    icon_color: "text-rose-200",
-    description: "Bloom box minimalis yang manis untuk diletakkan di meja kerja atau sudut kamar orang tersayang.",
-    tags: "Gift Idea"
-  },
-  {
-    id: 6,
-    name: "Single Rose Classic",
-    category: "kado",
-    rating: 4.9,
-    sold_count: 500,
-    bg_color: "bg-red-50",
-    icon_color: "text-red-200",
-    description: "Setangkai mawar merah klasik dengan wrapping aesthetic. Simpel namun penuh makna.",
-    tags: "Budget"
-  },
-  {
-    id: 7,
-    name: "Graduation Blue Sky",
-    category: "wisuda",
-    rating: 4.8,
-    sold_count: 65,
-    bg_color: "bg-blue-50",
-    icon_color: "text-blue-300",
-    description: "Nuansa biru langit yang menenangkan. Cocok untuk wisudawan laki-laki atau pecinta warna cool tone.",
-    tags: "New"
-  },
-  {
-    id: 8,
-    name: "Rustic Dried Flower",
-    category: "aniv",
-    rating: 5.0,
-    sold_count: 22,
-    bg_color: "bg-amber-50",
-    icon_color: "text-amber-700",
-    description: "Kombinasi bunga kering dan sintetis bernuansa earth tone. Estetik banget untuk dekorasi kamar.",
-    tags: "Aesthetic"
-  }
-];
-
 export default function ProductGrid({ filterCategory }: Props) {
-  const shown = filterCategory && filterCategory !== 'all'
-    ? products.filter((p) => p.category === filterCategory)
-    : products;
+  const [products, setProducts] = useState<Product[]>([]);
+  const [total, setTotal] = useState(0);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [loading, setLoading] = useState(true);
+
+  const fetchProducts = useCallback(async (cat: string, pg: number) => {
+    setLoading(true);
+    try {
+      const params = new URLSearchParams({ page: String(pg), per_page: '12' });
+      if (cat && cat !== 'all') params.set('category', cat);
+
+      const res = await fetch(`/api/v1/produk?${params}`);
+      if (res.ok) {
+        const data: PaginatedResponse<Product> = await res.json();
+        setProducts(data.data ?? []);
+        setTotal(data.total ?? 0);
+        setTotalPages(data.total_pages ?? 1);
+      }
+    } catch {
+      // keep empty state on error
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    setPage(1);
+    fetchProducts(filterCategory || 'all', 1);
+  }, [filterCategory, fetchProducts]);
+
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
+    fetchProducts(filterCategory || 'all', newPage);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   return (
     <div>
@@ -109,16 +52,52 @@ export default function ProductGrid({ filterCategory }: Props) {
         <div>
           <h3 className="font-serif text-2xl text-gray-800">Katalog Pilihan</h3>
           <p className="text-xs text-gray-400 mt-1">
-            Menampilkan {shown.length} produk
+            {loading ? 'Memuat...' : `Menampilkan ${products.length} dari ${total} produk`}
           </p>
         </div>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-8">
-        {shown.map((product) => (
-          <ProductCard key={product.id} product={product} />
-        ))}
-      </div>
+      {loading ? (
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-8">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <div key={i} className="bg-gray-100 rounded-2xl aspect-[4/5] animate-pulse" />
+          ))}
+        </div>
+      ) : products.length === 0 ? (
+        <div className="text-center py-16 text-gray-400">
+          <p className="text-lg">Belum ada produk di kategori ini</p>
+        </div>
+      ) : (
+        <>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-8">
+            {products.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+
+          {totalPages > 1 && (
+            <div className="flex justify-center gap-2 mt-10">
+              <button
+                onClick={() => handlePageChange(page - 1)}
+                disabled={page === 1}
+                className="px-4 py-2 rounded-lg border border-gray-200 text-sm font-medium text-gray-600 hover:bg-pink-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              >
+                ← Sebelumnya
+              </button>
+              <span className="px-4 py-2 text-sm text-gray-500">
+                {page} / {totalPages}
+              </span>
+              <button
+                onClick={() => handlePageChange(page + 1)}
+                disabled={page === totalPages}
+                className="px-4 py-2 rounded-lg border border-gray-200 text-sm font-medium text-gray-600 hover:bg-pink-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              >
+                Selanjutnya →
+              </button>
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 }
