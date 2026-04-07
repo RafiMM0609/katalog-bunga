@@ -21,7 +21,12 @@ export const siteConfig = {
 } as const;
 
 // ===== ADMIN AUTH =====
-export const authConfig = {
+export const authConfig: {
+  readonly jwtSecret: string;
+  readonly cookieName: 'admin_token';
+  readonly tokenExpiry: '24h';
+  readonly cookieMaxAge: number;
+} = {
   get jwtSecret(): string {
     const secret = process.env.ADMIN_SECRET_KEY;
     if (!secret && process.env.NODE_ENV === 'production') {
