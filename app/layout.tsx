@@ -1,18 +1,7 @@
 import type { Metadata } from "next";
-import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
-
-const inter = Inter({ 
-  subsets: ["latin"],
-  variable: '--font-geist-sans',
-});
-
-const jetbrains = JetBrains_Mono({
-  subsets: ["latin"],
-  variable: '--font-jet-mono',
-});
 
 export const metadata: Metadata = {
   title: "Kagitacraft - Bunga Abadi Penuh Makna",
@@ -63,7 +52,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="id">
-      <body className={`${inter.variable} ${jetbrains.variable} font-sans antialiased`}>
+      <body className="font-sans antialiased">
         <Header />
         <main className="pt-20 pb-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 min-h-screen">
           {children}

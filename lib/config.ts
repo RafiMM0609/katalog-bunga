@@ -21,18 +21,23 @@ export const siteConfig = {
 } as const;
 
 // ===== ADMIN AUTH =====
-export const authConfig = {
-  jwtSecret: (() => {
+export const authConfig: {
+  readonly jwtSecret: string;
+  readonly cookieName: 'admin_token';
+  readonly tokenExpiry: '24h';
+  readonly cookieMaxAge: number;
+} = {
+  get jwtSecret(): string {
     const secret = process.env.ADMIN_SECRET_KEY;
     if (!secret && process.env.NODE_ENV === 'production') {
       throw new Error('ADMIN_SECRET_KEY environment variable must be set in production');
     }
     return secret || 'default-secret-key';
-  })(),
+  },
   cookieName: 'admin_token',
   tokenExpiry: '24h',
   cookieMaxAge: 60 * 60 * 24, // 24 hours in seconds
-} as const;
+};
 
 // ===== IMAGE UPLOAD =====
 export const uploadConfig = {
