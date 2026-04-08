@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
     const buffer = Buffer.from(bytes);
 
     // Compress image to stay within maxOutputSizeBytes (1 MB)
-    let quality = uploadConfig.jpegQuality;
+    let quality = uploadConfig.webpQuality;
     let processedBuffer: Buffer;
 
     do {
@@ -32,20 +32,20 @@ export async function POST(request: NextRequest) {
           fit: 'inside',
           withoutEnlargement: true,
         })
-        .jpeg({ quality })
+        .webp({ quality })
         .toBuffer();
 
-      quality -= uploadConfig.jpegQualityDecrement;
-    } while (processedBuffer.length > uploadConfig.maxOutputSizeBytes && quality > uploadConfig.minJpegQuality);
+      quality -= uploadConfig.webpQualityDecrement;
+    } while (processedBuffer.length > uploadConfig.maxOutputSizeBytes && quality > uploadConfig.minWebpQuality);
 
     const timestamp = Date.now();
-    const filename = `product-${timestamp}.jpg`;
+    const filename = `product-${timestamp}.webp`;
     const storagePath = `products/${filename}`;
 
     const { error: uploadError } = await supabase.storage
       .from(supabaseConfig.storage.bucket)
       .upload(storagePath, processedBuffer, {
-        contentType: 'image/jpeg',
+        contentType: 'image/webp',
         upsert: false,
       });
 
