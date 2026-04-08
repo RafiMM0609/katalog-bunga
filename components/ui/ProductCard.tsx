@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Heart, Star } from "lucide-react";
 import type { Product } from "@/lib/types";
 
@@ -23,12 +24,22 @@ export default function ProductCard({ product }: ProductCardProps) {
             product.bg_color === 'bg-white' ? 'bg-gray-50' : product.bg_color
           } rounded-xl flex items-center justify-center relative overflow-hidden transition-all`}
         >
-          <Heart
-            className={`${product.icon_color} opacity-60 group-hover:scale-110 transition-transform duration-700`}
-            size={60}
-            strokeWidth={1}
-            fill="currentColor"
-          />
+          {product.image_url ? (
+            <Image
+              src={product.image_url}
+              alt={product.name}
+              fill
+              className="object-cover"
+              sizes="(max-width: 768px) 50vw, 25vw"
+            />
+          ) : (
+            <Heart
+              className={`${product.icon_color} opacity-60 group-hover:scale-110 transition-transform duration-700`}
+              size={60}
+              strokeWidth={1}
+              fill="currentColor"
+            />
+          )}
 
           {/* Floating Tags */}
           <div className="absolute top-3 left-3 flex flex-col gap-1">
