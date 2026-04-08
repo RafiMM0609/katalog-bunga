@@ -8,7 +8,7 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
-  const tagsArray = product.tags ? product.tags.split(',').map(t => t.trim()) : [];
+  const tagsArray = product.tags ? product.tags.split(',').map(t => t.trim()).slice(0, 3) : [];
   const categoryName = product.category
     ? typeof product.category === 'string'
       ? product.category
@@ -42,11 +42,11 @@ export default function ProductCard({ product }: ProductCardProps) {
           )}
 
           {/* Floating Tags */}
-          <div className="absolute top-3 left-3 flex flex-col gap-1">
+          <div className="absolute top-2 left-2 flex flex-row flex-wrap gap-1 max-w-[90%]">
             {tagsArray.map((tag, idx) => (
               <span
                 key={idx}
-                className="bg-white/90 backdrop-blur-sm px-2 py-1 rounded-full text-[10px] font-semibold text-pink-600 shadow-sm border border-pink-50"
+                className="bg-white/90 backdrop-blur-sm px-1.5 py-0.5 md:px-2 md:py-1 rounded-full text-[9px] md:text-[10px] font-semibold text-pink-600 shadow-sm border border-pink-50 whitespace-nowrap"
               >
                 {tag}
               </span>
