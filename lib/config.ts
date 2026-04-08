@@ -41,14 +41,13 @@ export const authConfig: {
 
 // ===== IMAGE UPLOAD =====
 export const uploadConfig = {
-  maxFileSizeBytes: 5 * 1024 * 1024,    // 5 MB input limit
   maxOutputSizeBytes: 1 * 1024 * 1024,  // 1 MB after compression
   maxWidth: 800,
   maxHeight: 1000,
   jpegQuality: 82,
   jpegQualityDecrement: 5,              // step to reduce quality in adaptive loop
   minJpegQuality: 10,                   // floor quality before giving up
-  allowedMimeTypes: ['image/jpeg', 'image/png', 'image/webp', 'image/gif'],
+  allowedMimeTypes: ['image/jpeg', 'image/png', 'image/webp'],
 } as const;
 
 // ===== PAGINATION =====
