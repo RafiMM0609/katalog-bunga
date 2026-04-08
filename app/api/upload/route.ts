@@ -16,14 +16,7 @@ export async function POST(request: NextRequest) {
     }
 
     if (!uploadConfig.allowedMimeTypes.includes(file.type as any)) {
-      return NextResponse.json({ error: 'File must be an image (jpeg, png, webp, gif)' }, { status: 400 });
-    }
-
-    if (file.size > uploadConfig.maxFileSizeBytes) {
-      return NextResponse.json(
-        { error: `File size must be less than ${uploadConfig.maxFileSizeBytes / 1024 / 1024}MB` },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'File must be an image (jpeg, png, webp)' }, { status: 400 });
     }
 
     const bytes = await file.arrayBuffer();
@@ -81,10 +74,3 @@ export async function POST(request: NextRequest) {
   }
 }
 
-export const config = {
-  api: {
-    bodyParser: {
-      sizeLimit: '5mb',
-    },
-  },
-};
