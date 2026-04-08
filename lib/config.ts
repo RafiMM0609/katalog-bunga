@@ -44,9 +44,9 @@ export const uploadConfig = {
   maxOutputSizeBytes: 1 * 1024 * 1024,  // 1 MB after compression
   maxWidth: 800,
   maxHeight: 1000,
-  jpegQuality: 82,
-  jpegQualityDecrement: 5,              // step to reduce quality in adaptive loop
-  minJpegQuality: 10,                   // floor quality before giving up
+  webpQuality: 82,
+  webpQualityDecrement: 5,              // step to reduce quality in adaptive loop
+  minWebpQuality: 10,                   // floor quality before giving up
   allowedMimeTypes: ['image/jpeg', 'image/png', 'image/webp'],
 } as const;
 

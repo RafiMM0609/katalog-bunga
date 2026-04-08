@@ -28,6 +28,9 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
         title: product.name,
         description: product.description,
         type: 'website',
+        ...(product.image_url && {
+          images: [{ url: product.image_url, width: 800, height: 1000, alt: product.name }],
+        }),
       },
     };
   } catch (error) {
