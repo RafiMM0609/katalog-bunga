@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { Heart, MessageCircle, Star, MessageSquare, Phone, User, FileText, X } from 'lucide-react';
 import ColorPicker from '@/components/ui/ColorPicker';
 import RatingStars from '@/components/ui/RatingStars';
@@ -17,6 +18,7 @@ interface Product {
   icon_color: string;
   description: string;
   tags?: string;
+  image_url?: string;
 }
 
 interface ProductDetailServerProps {
@@ -88,11 +90,22 @@ export default function ProductDetailServer({ product }: ProductDetailServerProp
           } flex items-center justify-center relative overflow-hidden`}
         >
           <div className="absolute inset-0 bg-white/10"></div>
-          <Heart
-            className={`${product.icon_color} opacity-60 animate-pulse-slow`}
-            size={180}
-            fill="currentColor"
-          />
+          {product.image_url ? (
+            <Image
+              src={product.image_url}
+              alt={product.name}
+              fill
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, 50vw"
+              priority
+            />
+          ) : (
+            <Heart
+              className={`${product.icon_color} opacity-60 animate-pulse-slow`}
+              size={180}
+              fill="currentColor"
+            />
+          )}
 
           {/* Decorative Blobs */}
           <div className="absolute top-10 right-10 w-20 h-20 bg-white/20 rounded-full blur-xl"></div>
