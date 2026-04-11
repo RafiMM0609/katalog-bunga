@@ -14,18 +14,12 @@ const REAL_FRAMES = [
   "/hero-animate-flower/Animasi_Bunga_Mekar_Dari_Daun_008.jpg",
 ];
 
-// Virtual "burst-out" frames shown after full bloom.
-// The same fully-bloomed image is scaled beyond the circular ring,
-// making the petals appear to burst dramatically out of the frame.
+// Last 3 frames: flower bursts beyond the static circle ring.
 type BurstConfig = { scale: number; rotation: number; glowOpacity: number };
 const BURST_CONFIGS: BurstConfig[] = [
-  { scale: 1.07, rotation: 0.0, glowOpacity: 0.30 },
-  { scale: 1.16, rotation: 1.5, glowOpacity: 0.50 },
-  { scale: 1.27, rotation: 2.5, glowOpacity: 0.65 },
-  { scale: 1.35, rotation: 3.0, glowOpacity: 0.78 },
-  { scale: 1.28, rotation: 2.0, glowOpacity: 0.62 },
-  { scale: 1.16, rotation: 1.0, glowOpacity: 0.42 },
-  { scale: 1.05, rotation: 0.0, glowOpacity: 0.22 },
+  { scale: 1.20, rotation: 1.5, glowOpacity: 0.50 },
+  { scale: 1.38, rotation: 2.5, glowOpacity: 0.70 },
+  { scale: 1.50, rotation: 3.5, glowOpacity: 0.90 },
 ];
 
 const N_REAL = REAL_FRAMES.length;
@@ -84,9 +78,10 @@ export default function FlowerAnimation() {
   const imgRotation = burstConfig?.rotation ?? 0;
   const glowOpacity = burstConfig?.glowOpacity ?? 0;
 
+  // Outer layout container – maximised to give room for burst overflow, no visible border
   return (
     <div
-      className="relative cursor-pointer select-none"
+      className="relative w-64 h-64 md:w-80 md:h-80 flex items-center justify-center cursor-pointer select-none"
       onMouseEnter={() => {
         isHoveringRef.current = true;
         stopAnimation();
@@ -103,9 +98,9 @@ export default function FlowerAnimation() {
       }}
       title="Klik untuk memutar ulang animasi"
     >
-      {/* Fixed-size wrapper – defines the ring position and never changes size */}
-      <div className="relative w-40 h-40 md:w-52 md:h-52">
-        {/* Ring border rendered behind the image so petals burst over it */}
+      {/* Static circle – fixed size, never changes regardless of animation frame */}
+      <div className="relative w-40 h-40 md:w-52 md:h-52 shrink-0">
+        {/* Ring rendered behind the image so petals burst over it in the last 3 frames */}
         <div
           className="absolute inset-0 rounded-full ring-4 ring-pink-200 ring-offset-2 pointer-events-none"
           style={
@@ -117,7 +112,7 @@ export default function FlowerAnimation() {
           }
         />
 
-        {/* Flower image – scaled up during burst frames so it overflows the ring */}
+        {/* Flower image – scaled beyond the static ring during the last 3 burst frames */}
         <Image
           src={displaySrc}
           alt={`Bunga mekar - frame ${frame + 1}`}
