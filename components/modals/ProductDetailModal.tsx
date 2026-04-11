@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { X, Heart, MessageCircle, Star, MessageSquare, Phone, User, FileText } from 'lucide-react';
 import ColorPicker from '@/components/ui/ColorPicker';
 import RatingStars from '@/components/ui/RatingStars';
@@ -17,6 +18,7 @@ interface Product {
   icon_color: string;
   description: string;
   tags?: string;
+  image_url?: string;
 }
 
 interface ProductDetailModalProps {
@@ -27,6 +29,7 @@ interface ProductDetailModalProps {
 export default function ProductDetailModal({ product, onClose }: ProductDetailModalProps) {
   const [paperColor, setPaperColor] = useState('');
   const [userRating, setUserRating] = useState(0);
+  const [ratingSubmitted, setRatingSubmitted] = useState(false);
   const [paperColors, setPaperColors] = useState<{ name: string; hex: string }[]>([]);
 
   // Order form state
@@ -48,6 +51,21 @@ export default function ProductDetailModal({ product, onClose }: ProductDetailMo
       })
       .catch(() => {});
   }, []);
+
+  const handleRatingChange = async (rating: number) => {
+    setUserRating(rating);
+    setRatingSubmitted(false);
+    try {
+      await fetch(`/api/v1/produk/${product.id}/rate`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ rating }),
+      });
+      setRatingSubmitted(true);
+    } catch {
+      // non-blocking
+    }
+  };
 
   const handleOrderSubmit = async () => {
     if (!customerName.trim() || !customerPhone.trim()) return;
@@ -98,11 +116,21 @@ export default function ProductDetailModal({ product, onClose }: ProductDetailMo
             } flex items-center justify-center relative overflow-hidden rounded-t-3xl md:rounded-l-3xl md:rounded-tr-none`}
           >
             <div className="absolute inset-0 bg-white/10"></div>
-            <Heart
-              className={`${product.icon_color} opacity-60 animate-pulse-slow`}
-              size={180}
-              fill="currentColor"
-            />
+            {product.image_url ? (
+              <Image
+                src={product.image_url}
+                alt={product.name}
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 100vw, 50vw"
+              />
+            ) : (
+              <Heart
+                className={`${product.icon_color} opacity-60 animate-pulse-slow`}
+                size={180}
+                fill="currentColor"
+              />
+            )}
 
             {/* Decorative Blobs */}
             <div className="absolute top-10 right-10 w-20 h-20 bg-white/20 rounded-full blur-xl"></div>
@@ -169,9 +197,9 @@ export default function ProductDetailModal({ product, onClose }: ProductDetailMo
                 Berikan Penilaian
               </h3>
               <div className="flex justify-center md:justify-start">
-                <RatingStars rating={userRating} onRatingChange={setUserRating} />
+                <RatingStars rating={userRating} onRatingChange={handleRatingChange} />
               </div>
-              {userRating > 0 && (
+              {ratingSubmitted && (
                 <p className="text-xs text-green-500 mt-2 font-medium animate-pulse text-center md:text-left">
                   Terima kasih atas penilaian Anda!
                 </p>
