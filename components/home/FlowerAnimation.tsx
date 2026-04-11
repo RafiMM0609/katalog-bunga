@@ -29,7 +29,8 @@ const BURST_CONFIGS: BurstConfig[] = [
 ];
 
 const N_REAL = REAL_FRAMES.length;
-const TOTAL_FRAMES = N_REAL + BURST_CONFIGS.length;
+// const TOTAL_FRAMES = N_REAL + BURST_CONFIGS.length;
+const TOTAL_FRAMES = N_REAL;
 // Slightly longer than the original 180 ms so burst frames feel deliberate
 const FRAME_DURATION = 200; // ms per frame
 
