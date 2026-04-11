@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useEffect } from "react";
-import { Plus, Edit3, Trash2, Image as ImageIcon } from "lucide-react";
+import Image from "next/image";
+import { Plus, Edit3, Trash2, ImageIcon } from "lucide-react";
 import toast from "react-hot-toast";
 import ProductForm from "./ProductForm";
 import ConfirmDialog from "./ConfirmDialog";
@@ -17,6 +18,7 @@ interface Product {
   icon_color: string;
   tags?: string;
   is_active: boolean;
+  image_url?: string;
 }
 
 export default function ProductManagement() {
@@ -115,9 +117,19 @@ export default function ProductManagement() {
                 className="flex items-center gap-4 p-3 border border-gray-100 rounded-xl hover:bg-pink-50/30 transition-colors"
               >
                 <div className="w-12 h-12 rounded-lg bg-gray-100 overflow-hidden flex-shrink-0">
-                  <div className="w-full h-full flex items-center justify-center text-gray-300">
-                    <ImageIcon size={20} />
-                  </div>
+                  {product.image_url ? (
+                    <Image
+                      src={product.image_url}
+                      alt={product.name}
+                      width={48}
+                      height={48}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-gray-300">
+                      <ImageIcon size={20} />
+                    </div>
+                  )}
                 </div>
                 <div className="flex-1">
                   <h4 className="font-bold text-gray-800 text-sm">{product.name}</h4>

@@ -28,6 +28,7 @@ interface ProductDetailServerProps {
 export default function ProductDetailServer({ product }: ProductDetailServerProps) {
   const [paperColor, setPaperColor] = useState('');
   const [userRating, setUserRating] = useState(0);
+  const [ratingSubmitted, setRatingSubmitted] = useState(false);
   const [paperColors, setPaperColors] = useState<{ name: string; hex: string }[]>([]);
 
   // Order form state
@@ -49,6 +50,21 @@ export default function ProductDetailServer({ product }: ProductDetailServerProp
       })
       .catch(() => {});
   }, []);
+
+  const handleRatingChange = async (rating: number) => {
+    setUserRating(rating);
+    setRatingSubmitted(false);
+    try {
+      await fetch(`/api/v1/produk/${product.id}/rate`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ rating }),
+      });
+      setRatingSubmitted(true);
+    } catch {
+      // non-blocking
+    }
+  };
 
   const handleOrderSubmit = async () => {
     if (!customerName.trim() || !customerPhone.trim()) return;
@@ -172,9 +188,9 @@ export default function ProductDetailServer({ product }: ProductDetailServerProp
               Berikan Penilaian
             </h3>
             <div className="flex justify-center md:justify-start">
-              <RatingStars rating={userRating} onRatingChange={setUserRating} />
+              <RatingStars rating={userRating} onRatingChange={handleRatingChange} />
             </div>
-            {userRating > 0 && (
+            {ratingSubmitted && (
               <p className="text-xs text-green-500 mt-2 font-medium animate-pulse text-center md:text-left">
                 Terima kasih atas penilaian Anda!
               </p>

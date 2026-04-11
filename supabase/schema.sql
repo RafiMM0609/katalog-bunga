@@ -52,6 +52,18 @@ CREATE TABLE IF NOT EXISTS paper_colors (
 CREATE INDEX IF NOT EXISTS idx_paper_colors_product_id ON paper_colors(product_id);
 
 -- ========================
+-- TABLE: product_ratings
+-- ========================
+CREATE TABLE IF NOT EXISTS product_ratings (
+  id         BIGSERIAL PRIMARY KEY,
+  product_id BIGINT      NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+  rating     SMALLINT    NOT NULL CHECK (rating >= 1 AND rating <= 5),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_product_ratings_product_id ON product_ratings(product_id);
+
+-- ========================
 -- TABLE: orders
 -- ========================
 CREATE TABLE IF NOT EXISTS orders (
@@ -101,6 +113,7 @@ ALTER TABLE categories  ENABLE ROW LEVEL SECURITY;
 ALTER TABLE products    ENABLE ROW LEVEL SECURITY;
 ALTER TABLE paper_colors ENABLE ROW LEVEL SECURITY;
 ALTER TABLE orders      ENABLE ROW LEVEL SECURITY;
+ALTER TABLE product_ratings ENABLE ROW LEVEL SECURITY;
 
 -- Public read access for categories, products, paper_colors
 CREATE POLICY "Public read categories"   ON categories   FOR SELECT USING (true);
@@ -112,9 +125,13 @@ CREATE POLICY "Service role full access categories"   ON categories   USING (aut
 CREATE POLICY "Service role full access products"     ON products     USING (auth.role() = 'service_role') WITH CHECK (auth.role() = 'service_role');
 CREATE POLICY "Service role full access paper_colors" ON paper_colors USING (auth.role() = 'service_role') WITH CHECK (auth.role() = 'service_role');
 CREATE POLICY "Service role full access orders"       ON orders       USING (auth.role() = 'service_role') WITH CHECK (auth.role() = 'service_role');
+CREATE POLICY "Service role full access product_ratings" ON product_ratings USING (auth.role() = 'service_role') WITH CHECK (auth.role() = 'service_role');
 
 -- Public can insert orders (customers placing orders)
 CREATE POLICY "Public insert orders" ON orders FOR INSERT WITH CHECK (true);
+
+-- Public can insert product ratings
+CREATE POLICY "Public insert product_ratings" ON product_ratings FOR INSERT WITH CHECK (true);
 
 -- ========================
 -- STORAGE BUCKET
