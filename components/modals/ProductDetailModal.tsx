@@ -100,13 +100,17 @@ export default function ProductDetailModal({ product, onClose }: ProductDetailMo
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
       <div className="bg-white rounded-3xl shadow-2xl max-w-5xl w-full max-h-[90vh] overflow-y-auto relative animate-fade-in">
-        {/* Close Button */}
-        <button
-          onClick={onClose}
-          className="sticky top-4 right-4 float-right z-10 bg-white rounded-full p-2 shadow-lg hover:bg-gray-100 transition-colors"
-        >
-          <X size={24} className="text-gray-600" />
-        </button>
+        {/* Close Button - sticky zero-height overlay so it doesn't shift content */}
+        <div className="sticky top-0 left-0 right-0 h-0 overflow-visible z-10">
+          <div className="flex justify-end p-4">
+            <button
+              onClick={onClose}
+              className="bg-white rounded-full p-2 shadow-lg hover:bg-gray-100 transition-colors"
+            >
+              <X size={24} className="text-gray-600" />
+            </button>
+          </div>
+        </div>
 
         <div className="flex flex-col md:flex-row">
           {/* LEFT: IMAGE SECTION */}
