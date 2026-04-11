@@ -20,6 +20,7 @@ export default function FlowerAnimation() {
   const [frame, setFrame] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const isHoveringRef = useRef(false);
 
   const startAnimation = () => {
     if (intervalRef.current) return;
@@ -35,7 +36,19 @@ export default function FlowerAnimation() {
       intervalRef.current = null;
     }
     setIsPlaying(false);
-    setFrame(FRAMES.length - 1); // hold on last (fully bloomed) frame on hover-stop
+    setFrame(FRAMES.length - 1); // hold on last (fully bloomed) frame while hovering
+  };
+
+  const restartAnimation = () => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+    setFrame(0);
+    setIsPlaying(true);
+    intervalRef.current = setInterval(() => {
+      setFrame((prev) => (prev + 1) % FRAMES.length);
+    }, FRAME_DURATION);
   };
 
   // Auto-play on mount, loop continuously
@@ -50,12 +63,18 @@ export default function FlowerAnimation() {
   return (
     <div
       className="relative cursor-pointer select-none"
-      onMouseEnter={stopAnimation}
-      onMouseLeave={startAnimation}
+      onMouseEnter={() => {
+        isHoveringRef.current = true;
+        stopAnimation();
+      }}
+      onMouseLeave={() => {
+        isHoveringRef.current = false;
+        startAnimation();
+      }}
       onClick={() => {
-        if (!isPlaying) {
-          setFrame(0);
-          startAnimation();
+        // Only restart if not currently hovering (which would re-stop it immediately)
+        if (!isHoveringRef.current) {
+          restartAnimation();
         }
       }}
       title="Klik untuk memutar ulang animasi"
@@ -69,7 +88,7 @@ export default function FlowerAnimation() {
         priority
       />
       <span className="absolute bottom-2 right-2 bg-white/70 backdrop-blur-sm rounded-full px-2 py-0.5 text-xs text-pink-600 font-medium shadow pointer-events-none">
-        {isPlaying ? "🌸 Mekar..." : "🌺 Hover untuk pause"}
+        {isPlaying ? "🌸 Mekar..." : "🌺 Klik untuk putar ulang"}
       </span>
     </div>
   );
