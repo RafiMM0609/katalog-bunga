@@ -28,10 +28,10 @@ export default function ColorPicker({
 }: ColorPickerProps) {
   return (
     <div>
-      <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">
+      <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 text-center md:text-left">
         Pilih Warna Kertas
       </h3>
-      <div className="flex flex-wrap gap-3">
+      <div className="flex flex-wrap gap-3 justify-center md:justify-start">
         {colors.map((item) => (
           <button
             key={item.name}
