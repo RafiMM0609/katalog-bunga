@@ -34,6 +34,9 @@ export async function POST(
     if (avgError) throw avgError;
 
     const ratings = (avgData ?? []).map((r: { rating: number }) => r.rating);
+    if (ratings.length === 0) {
+      return NextResponse.json({ average: rating }, { status: 201 });
+    }
     const average = ratings.reduce((sum: number, r: number) => sum + r, 0) / ratings.length;
     const rounded = Math.round(average * 10) / 10;
 
