@@ -100,9 +100,9 @@ export default function FlowerAnimation() {
     >
       {/* Static circle – fixed size, never changes regardless of animation frame */}
       <div className="relative w-40 h-40 md:w-52 md:h-52 shrink-0">
-        {/* Ring rendered behind the image so petals burst over it in the last 3 frames */}
+        {/* Ring in front of the image so it stays visible as a fixed circle while the flower bursts beyond it */}
         <div
-          className="absolute inset-0 rounded-full ring-4 ring-pink-200 ring-offset-2 pointer-events-none"
+          className="absolute inset-0 rounded-full ring-4 ring-pink-200 ring-offset-2 pointer-events-none z-20"
           style={
             glowOpacity > 0
               ? {
