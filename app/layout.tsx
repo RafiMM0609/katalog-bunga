@@ -4,6 +4,11 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 
 export const metadata: Metadata = {
+  icons: {
+    icon: '/favicon.ico',
+    shortcut: '/favicon.ico',
+    apple: '/apple-touch-icon.png',
+  },
   title: "Kagitacraft - Bunga Abadi Penuh Makna",
   description: "Temukan hadiah spesial yang tak akan pernah layu untuk momen terbaikmu. Bunga wisuda, hadiah guru, kado ulang tahun, buket pernikahan, dan anniversary.",
   keywords: ["bunga", "hadiah", "wisuda", "pernikahan", "ultah", "guru", "anniversary", "buket"],
