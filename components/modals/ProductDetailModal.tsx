@@ -70,6 +70,10 @@ export default function ProductDetailModal({ product, onClose }: ProductDetailMo
   const handleOrderSubmit = async () => {
     if (!customerName.trim() || !customerPhone.trim()) return;
 
+    // Open a blank tab immediately while still in the user-gesture context so
+    // Safari's popup blocker does not block the eventual WhatsApp redirect.
+    const waWindow = window.open('', '_blank');
+
     setSubmitting(true);
     try {
       await fetch('/api/v1/orders', {
@@ -93,7 +97,12 @@ export default function ProductDetailModal({ product, onClose }: ProductDetailMo
     const whatsappNumber = siteConfig.whatsappNumber;
     const message = `Halo Admin Kagitacraft, saya *${customerName.trim()}* tertarik dengan produk *${product.name}*.\n\nDetail Pilihan:\n- Warna Kertas: ${paperColor || '-'}\n- No HP: ${customerPhone.trim()}\n${notes.trim() ? `- Catatan: ${notes.trim()}\n` : ''}\nBoleh tolong info harga dan ongkirnya? Terima kasih.`;
     const encodedMessage = encodeURIComponent(message);
-    window.open(`https://wa.me/${whatsappNumber}?text=${encodedMessage}`, '_blank');
+    const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
+    if (waWindow) {
+      waWindow.location.href = whatsappUrl;
+    } else {
+      window.open(whatsappUrl, '_blank');
+    }
     setShowOrderForm(false);
   };
 
