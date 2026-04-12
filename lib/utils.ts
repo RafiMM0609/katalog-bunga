@@ -18,7 +18,7 @@ export function sendWhatsAppMessage(
     message += `- Catatan: ${additionalNotes}\n`;
   }
   
-  message += `\nBoleh tolong info harga dan ongkirnya? Terima kasih.`;
+  message += `\nBoleh tolong infonya kak? Terima kasih.`;
   
   const encodedMessage = encodeURIComponent(message);
   const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
