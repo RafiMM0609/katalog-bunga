@@ -28,6 +28,7 @@ export async function POST(request: NextRequest) {
 
     do {
       processedBuffer = await sharp(buffer)
+        .rotate()
         .resize(uploadConfig.maxWidth, uploadConfig.maxHeight, {
           fit: 'inside',
           withoutEnlargement: true,
