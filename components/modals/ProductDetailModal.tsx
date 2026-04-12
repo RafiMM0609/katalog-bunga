@@ -71,18 +71,10 @@ export default function ProductDetailModal({ product, onClose }: ProductDetailMo
 
     const whatsappNumber = siteConfig.whatsappNumber;
     const name = customerName.trim();
-    const baseMessage = `Halo Admin Kagitacraft, saya *${name}* tertarik dengan produk *${product.name}*.\n\nDetail Pilihan:\n- Warna Kertas: ${paperColor || '-'}\n\nBoleh tolong info harga dan ongkirnya? Terima kasih.`;
 
-    // Detect Web Share API with file support (available on Android Chrome / iOS Safari 15+)
-    const supportsFileShare =
-      product.image_url &&
-      typeof navigator !== 'undefined' &&
-      typeof navigator.share === 'function' &&
-      typeof navigator.canShare === 'function';
-
-    // Only pre-open a blank tab when we will fall back to wa.me (popup-blocker safe).
-    // For the Web Share path no pre-opened window is needed.
-    const waWindow = supportsFileShare ? null : window.open('', '_blank');
+    // Open a blank tab immediately while still in the user-gesture context so
+    // Safari's popup blocker does not block the eventual WhatsApp redirect.
+    const waWindow = window.open('', '_blank');
 
     // Record order fire-and-forget (non-blocking)
     fetch('/api/v1/orders', {
@@ -96,29 +88,9 @@ export default function ProductDetailModal({ product, onClose }: ProductDetailMo
       }),
     }).catch(() => {});
 
-    // ── Path 1: Web Share API with image file ───────────────────────────────
-    if (supportsFileShare) {
-      try {
-        const res = await fetch(product.image_url!);
-        const blob = await res.blob();
-        const ext = blob.type.includes('/') ? blob.type.split('/')[1] : 'jpg';
-        const imageFile = new File([blob], `${product.name}.${ext}`, { type: blob.type });
-
-        if (navigator.canShare({ files: [imageFile] })) {
-          await navigator.share({ files: [imageFile], text: baseMessage });
-          setSubmitting(false);
-          setShowOrderForm(false);
-          return;
-        }
-      } catch {
-        // Share was cancelled or failed — fall through to wa.me
-      }
-    }
-
-    // ── Path 2: wa.me fallback with image URL embedded in text ──────────────
     const imageInfo = product.image_url ? `\n- Foto Produk: ${product.image_url}` : '';
-    const fallbackMessage = `Halo Admin Kagitacraft, saya *${name}* tertarik dengan produk *${product.name}*.${imageInfo}\n\nDetail Pilihan:\n- Warna Kertas: ${paperColor || '-'}\n\nBoleh tolong info harga dan ongkirnya? Terima kasih.`;
-    const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(fallbackMessage)}`;
+    const message = `Halo Admin Kagitacraft, saya *${name}* tertarik dengan produk *${product.name}*.${imageInfo}\n\nDetail Pilihan:\n- Warna Kertas: ${paperColor || '-'}\n\nBoleh tolong info harga dan ongkirnya? Terima kasih.`;
+    const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
     if (waWindow) {
       waWindow.location.href = whatsappUrl;
     } else {
