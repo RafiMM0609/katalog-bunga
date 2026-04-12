@@ -82,7 +82,7 @@ export default function CategoryGrid({ activeCategory: activeCategoryProp, onCha
             key={src}
             src={src}
             alt=""
-            className={`absolute inset-0 w-full h-full object-cover object-bottom transition-opacity duration-300 ${i === frameIndex ? "opacity-40" : "opacity-0"}`}
+            className={`absolute inset-0 w-full h-full object-cover object-top transition-opacity duration-300 ${i === frameIndex ? "opacity-40" : "opacity-0"}`}
           />
         ))}
       </div>
