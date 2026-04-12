@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { X, Heart, MessageCircle, Star, MessageSquare, Phone, User, FileText } from 'lucide-react';
+import { X, Heart, MessageCircle, Star, MessageSquare, User } from 'lucide-react';
 import ColorPicker from '@/components/ui/ColorPicker';
 import RatingStars from '@/components/ui/RatingStars';
 import { siteConfig } from '@/lib/config';
@@ -35,8 +35,6 @@ export default function ProductDetailModal({ product, onClose }: ProductDetailMo
   // Order form state
   const [showOrderForm, setShowOrderForm] = useState(false);
   const [customerName, setCustomerName] = useState('');
-  const [customerPhone, setCustomerPhone] = useState('');
-  const [notes, setNotes] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
@@ -68,41 +66,66 @@ export default function ProductDetailModal({ product, onClose }: ProductDetailMo
   };
 
   const handleOrderSubmit = async () => {
-    if (!customerName.trim() || !customerPhone.trim()) return;
-
-    // Open a blank tab immediately while still in the user-gesture context so
-    // Safari's popup blocker does not block the eventual WhatsApp redirect.
-    const waWindow = window.open('', '_blank');
-
+    if (!customerName.trim()) return;
     setSubmitting(true);
-    try {
-      await fetch('/api/v1/orders', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          customer_name: customerName.trim(),
-          customer_phone: customerPhone.trim(),
-          product_id: product.id,
-          selected_paper_color: paperColor || null,
-          customer_rating: userRating || null,
-          notes: notes.trim() || null,
-        }),
-      });
-    } catch {
-      // non-blocking: still open WhatsApp even if order recording fails
-    } finally {
-      setSubmitting(false);
-    }
 
     const whatsappNumber = siteConfig.whatsappNumber;
-    const message = `Halo Admin Kagitacraft, saya *${customerName.trim()}* tertarik dengan produk *${product.name}*.\n\nDetail Pilihan:\n- Warna Kertas: ${paperColor || '-'}\n- No HP: ${customerPhone.trim()}\n${notes.trim() ? `- Catatan: ${notes.trim()}\n` : ''}\nBoleh tolong info harga dan ongkirnya? Terima kasih.`;
-    const encodedMessage = encodeURIComponent(message);
-    const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
+    const name = customerName.trim();
+    const baseMessage = `Halo Admin Kagitacraft, saya *${name}* tertarik dengan produk *${product.name}*.\n\nDetail Pilihan:\n- Warna Kertas: ${paperColor || '-'}\n\nBoleh tolong info harga dan ongkirnya? Terima kasih.`;
+
+    // Detect Web Share API with file support (available on Android Chrome / iOS Safari 15+)
+    const supportsFileShare =
+      product.image_url &&
+      typeof navigator !== 'undefined' &&
+      typeof navigator.share === 'function' &&
+      typeof navigator.canShare === 'function';
+
+    // Only pre-open a blank tab when we will fall back to wa.me (popup-blocker safe).
+    // For the Web Share path no pre-opened window is needed.
+    const waWindow = supportsFileShare ? null : window.open('', '_blank');
+
+    // Record order fire-and-forget (non-blocking)
+    fetch('/api/v1/orders', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        customer_name: name,
+        product_id: product.id,
+        selected_paper_color: paperColor || null,
+        customer_rating: userRating || null,
+      }),
+    }).catch(() => {});
+
+    // ── Path 1: Web Share API with image file ───────────────────────────────
+    if (supportsFileShare) {
+      try {
+        const res = await fetch(product.image_url!);
+        const blob = await res.blob();
+        const ext = blob.type.includes('/') ? blob.type.split('/')[1] : 'jpg';
+        const imageFile = new File([blob], `${product.name}.${ext}`, { type: blob.type });
+
+        if (navigator.canShare({ files: [imageFile] })) {
+          await navigator.share({ files: [imageFile], text: baseMessage });
+          setSubmitting(false);
+          setShowOrderForm(false);
+          return;
+        }
+      } catch {
+        // Share was cancelled or failed — fall through to wa.me
+      }
+    }
+
+    // ── Path 2: wa.me fallback with image URL embedded in text ──────────────
+    const imageInfo = product.image_url ? `\n- Foto Produk: ${product.image_url}` : '';
+    const fallbackMessage = `Halo Admin Kagitacraft, saya *${name}* tertarik dengan produk *${product.name}*.${imageInfo}\n\nDetail Pilihan:\n- Warna Kertas: ${paperColor || '-'}\n\nBoleh tolong info harga dan ongkirnya? Terima kasih.`;
+    const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(fallbackMessage)}`;
     if (waWindow) {
       waWindow.location.href = whatsappUrl;
     } else {
       window.open(whatsappUrl, '_blank');
     }
+
+    setSubmitting(false);
     setShowOrderForm(false);
   };
 
@@ -238,29 +261,9 @@ export default function ProductDetailModal({ product, onClose }: ProductDetailMo
                     className="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-lg text-sm focus:border-pink-500 focus:ring-2 focus:ring-pink-200 outline-none"
                   />
                 </div>
-                <div className="relative">
-                  <Phone size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                  <input
-                    type="tel"
-                    placeholder="No. HP / WhatsApp *"
-                    value={customerPhone}
-                    onChange={(e) => setCustomerPhone(e.target.value)}
-                    className="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-lg text-sm focus:border-pink-500 focus:ring-2 focus:ring-pink-200 outline-none"
-                  />
-                </div>
-                <div className="relative">
-                  <FileText size={16} className="absolute left-3 top-3 text-gray-400" />
-                  <textarea
-                    rows={2}
-                    placeholder="Catatan (opsional)"
-                    value={notes}
-                    onChange={(e) => setNotes(e.target.value)}
-                    className="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-lg text-sm focus:border-pink-500 focus:ring-2 focus:ring-pink-200 outline-none resize-none"
-                  />
-                </div>
                 <button
                   onClick={handleOrderSubmit}
-                  disabled={submitting || !customerName.trim() || !customerPhone.trim()}
+                  disabled={submitting || !customerName.trim()}
                   className="w-full bg-gray-800 text-white font-medium py-3 rounded-xl shadow-lg hover:bg-pink-600 transition-all duration-300 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <MessageCircle size={20} />
