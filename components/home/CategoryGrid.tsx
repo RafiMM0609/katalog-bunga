@@ -82,12 +82,12 @@ export default function CategoryGrid({ activeCategory: activeCategoryProp, onCha
             key={src}
             src={src}
             alt=""
-            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${i === frameIndex ? "opacity-20" : "opacity-0"}`}
+            className={`absolute inset-0 w-full h-full object-cover object-bottom transition-opacity duration-300 ${i === frameIndex ? "opacity-40" : "opacity-0"}`}
           />
         ))}
       </div>
       {/* Soft gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-b from-white/60 to-white/80 pointer-events-none" aria-hidden="true" />
+      <div className="absolute inset-0 bg-gradient-to-b from-white/40 to-white/60 pointer-events-none" aria-hidden="true" />
 
       {/* Content */}
       <div className="relative z-10 w-full flex flex-col items-center">
