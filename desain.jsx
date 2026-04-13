@@ -312,7 +312,7 @@ function ProductDetailView({ product, onBack }) {
   const handleRating = (rate) => setUserRating(rate);
 
   const handleOrder = () => {
-    const message = `Halo Admin Kagitacraft, saya tertarik dengan produk *${product.name}*.\n\nDetail Pilihan:\n- Warna Kertas: ${paperColor}\n\nBoleh tolong info harga dan ongkirnya? Terima kasih.`;
+    const message = `Halo Admin Kagitacraft, saya tertarik dengan produk *${product.name}*.\n\nDetail Pilihan:\n- Warna Kertas: ${paperColor}\n\nBoleh tolong infonya kak? Terima kasih.`;
     alert(`Membuka WhatsApp...\n\nPesan:\n${message}`);
   };
 

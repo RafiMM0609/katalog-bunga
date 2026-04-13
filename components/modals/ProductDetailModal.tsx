@@ -89,7 +89,7 @@ export default function ProductDetailModal({ product, onClose }: ProductDetailMo
     }).catch(() => {});
 
     const imageInfo = product.image_url ? `\n- Foto Produk: ${product.image_url}` : '';
-    const message = `Halo Admin Kagitacraft, saya *${name}* tertarik dengan produk *${product.name}*.${imageInfo}\n\nDetail Pilihan:\n- Warna Kertas: ${paperColor || '-'}\n\nBoleh tolong info harga dan ongkirnya? Terima kasih.`;
+    const message = `Halo Admin Kagitacraft, saya *${name}* tertarik dengan produk *${product.name}*.${imageInfo}\n\nDetail Pilihan:\n- Warna Kertas: ${paperColor || '-'}\n\nBoleh tolong infonya kak? Terima kasih.`;
     const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
     if (waWindow) {
       waWindow.location.href = whatsappUrl;
