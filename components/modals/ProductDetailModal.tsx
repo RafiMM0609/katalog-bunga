@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { X, Heart, MessageCircle, Star, MessageSquare, User } from 'lucide-react';
+import { X, Heart, MessageCircle, Star, MessageSquare, User, Phone, FileText } from 'lucide-react';
 import ColorPicker from '@/components/ui/ColorPicker';
 import RatingStars from '@/components/ui/RatingStars';
 import { siteConfig } from '@/lib/config';
@@ -23,7 +23,7 @@ interface Product {
 
 interface ProductDetailModalProps {
   product: Product;
-  onClose: () => void;
+  onClose?: () => void;
 }
 
 export default function ProductDetailModal({ product, onClose }: ProductDetailModalProps) {
@@ -35,6 +35,8 @@ export default function ProductDetailModal({ product, onClose }: ProductDetailMo
   // Order form state
   const [showOrderForm, setShowOrderForm] = useState(false);
   const [customerName, setCustomerName] = useState('');
+  const [customerPhone, setCustomerPhone] = useState('');
+  const [notes, setNotes] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
@@ -69,9 +71,6 @@ export default function ProductDetailModal({ product, onClose }: ProductDetailMo
     if (!customerName.trim()) return;
     setSubmitting(true);
 
-    const whatsappNumber = siteConfig.whatsappNumber;
-    const name = customerName.trim();
-
     // Open a blank tab immediately while still in the user-gesture context so
     // Safari's popup blocker does not block the eventual WhatsApp redirect.
     const waWindow = window.open('', '_blank');
@@ -81,15 +80,20 @@ export default function ProductDetailModal({ product, onClose }: ProductDetailMo
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        customer_name: name,
+        customer_name: customerName.trim(),
+        customer_phone: customerPhone.trim() || null,
         product_id: product.id,
         selected_paper_color: paperColor || null,
         customer_rating: userRating || null,
+        notes: notes.trim() || null,
       }),
     }).catch(() => {});
 
+    const whatsappNumber = siteConfig.whatsappNumber;
     const imageInfo = product.image_url ? `\n- Foto Produk: ${product.image_url}` : '';
-    const message = `Halo Admin Kagitacraft, saya *${name}* tertarik dengan produk *${product.name}*.${imageInfo}\n\nDetail Pilihan:\n- Warna Kertas: ${paperColor || '-'}\n\nBoleh tolong infonya kak? Terima kasih.`;
+    const phoneInfo = customerPhone.trim() ? `\n- No HP: ${customerPhone.trim()}` : '';
+    const notesInfo = notes.trim() ? `\n- Catatan: ${notes.trim()}` : '';
+    const message = `Halo Admin Kagitacraft, saya *${customerName.trim()}* tertarik dengan produk *${product.name}*.${imageInfo}\n\nDetail Pilihan:\n- Warna Kertas: ${paperColor || '-'}${phoneInfo}${notesInfo}\n\nBoleh tolong infonya kak? Terima kasih.`;
     const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
     if (waWindow) {
       waWindow.location.href = whatsappUrl;
@@ -101,158 +105,198 @@ export default function ProductDetailModal({ product, onClose }: ProductDetailMo
     setShowOrderForm(false);
   };
 
-  return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
-      <div className="bg-white rounded-3xl shadow-2xl max-w-5xl w-full max-h-[90vh] overflow-y-auto relative animate-fade-in">
-        {/* Close Button - sticky zero-height overlay so it doesn't shift content */}
-        <div className="sticky top-0 left-0 right-0 h-0 overflow-visible z-10">
-          <div className="flex justify-end p-4">
-            <button
-              onClick={onClose}
-              className="bg-white rounded-full p-2 shadow-lg hover:bg-gray-100 transition-colors"
-            >
-              <X size={24} className="text-gray-600" />
+  const imageSection = (
+    <div
+      className={`w-full md:w-1/2 min-h-[350px] md:min-h-[500px] ${
+        product.bg_color === 'bg-white' ? 'bg-pink-50' : product.bg_color
+      } flex items-center justify-center relative overflow-hidden ${
+        onClose ? 'rounded-t-3xl md:rounded-l-3xl md:rounded-tr-none' : ''
+      }`}
+    >
+      <div className="absolute inset-0 bg-white/10"></div>
+      {product.image_url ? (
+        <Image
+          src={product.image_url}
+          alt={product.name}
+          fill
+          className="object-cover"
+          sizes="(max-width: 768px) 100vw, 50vw"
+          priority={!onClose}
+        />
+      ) : (
+        <Heart
+          className={`${product.icon_color} opacity-60 animate-pulse-slow`}
+          size={180}
+          fill="currentColor"
+        />
+      )}
+
+      {/* Decorative Blobs */}
+      <div className="absolute top-10 right-10 w-20 h-20 bg-white/20 rounded-full blur-xl"></div>
+      <div className="absolute bottom-10 left-10 w-32 h-32 bg-white/20 rounded-full blur-xl"></div>
+    </div>
+  );
+
+  const infoSection = (
+    <div className={`w-full md:w-1/2 p-6 md:p-10 flex flex-col justify-center bg-[#FFF8F8] ${
+      onClose ? 'rounded-b-3xl md:rounded-r-3xl md:rounded-bl-none' : ''
+    }`}>
+      {/* Breadcrumb / Meta */}
+      <div className="flex items-center gap-2 mb-4">
+        {product.category && (
+          <span className="bg-pink-100 text-pink-600 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-widest">
+            {product.category.name || product.category}
+          </span>
+        )}
+        <div className="flex items-center gap-1 text-yellow-500">
+          <Star size={12} fill="currentColor" />
+          <span className="text-xs font-bold">{product.rating}</span>
+        </div>
+        <span className="text-xs text-gray-400">• {product.sold_count} terjual</span>
+      </div>
+
+      <h1 className="font-serif text-3xl md:text-4xl text-gray-800 mb-6 leading-tight">
+        {product.name}
+      </h1>
+
+      {/* Info Box */}
+      <div className="bg-white border border-pink-100 rounded-xl p-4 flex items-start gap-4 mb-8 shadow-sm">
+        <div className="bg-pink-50 p-2 rounded-full text-pink-500">
+          <MessageSquare size={20} />
+        </div>
+        <div>
+          <p className="text-sm font-bold text-gray-700">Harga Spesial (By Request)</p>
+          <p className="text-xs text-gray-500 mt-1 leading-relaxed">
+            Harga menyesuaikan dengan kustomisasi. Hubungi kami untuk penawaran terbaik.
+          </p>
+        </div>
+      </div>
+
+      {/* Description */}
+      <div className="mb-8">
+        <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">
+          Keterangan Produk
+        </h3>
+        <p className="text-gray-600 text-sm md:text-base leading-relaxed font-light">
+          {product.description}
+        </p>
+      </div>
+
+      {/* Customization */}
+      {paperColors.length > 0 && (
+        <div className="mb-8">
+          <ColorPicker
+            colors={paperColors}
+            selectedColor={paperColor}
+            onColorChange={setPaperColor}
+          />
+        </div>
+      )}
+
+      {/* Rating Interaction */}
+      <div className="mb-8 pt-6 border-t border-gray-100">
+        <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 text-center md:text-left">
+          Berikan Penilaian
+        </h3>
+        <div className="flex justify-center md:justify-start">
+          <RatingStars rating={userRating} onRatingChange={handleRatingChange} />
+        </div>
+        {ratingSubmitted && (
+          <p className="text-xs text-green-500 mt-2 font-medium animate-pulse text-center md:text-left">
+            Terima kasih atas penilaian Anda!
+          </p>
+        )}
+      </div>
+
+      {/* Order Form (inline) */}
+      {showOrderForm ? (
+        <div className="border border-pink-200 rounded-xl p-4 mb-4 bg-white space-y-3">
+          <div className="flex items-center justify-between mb-1">
+            <p className="text-sm font-bold text-gray-700">Data Pemesan</p>
+            <button onClick={() => setShowOrderForm(false)} className="text-gray-400 hover:text-red-500 transition-colors">
+              <X size={18} />
             </button>
           </div>
-        </div>
-
-        <div className="flex flex-col md:flex-row">
-          {/* LEFT: IMAGE SECTION */}
-          <div
-            className={`w-full md:w-1/2 min-h-[350px] md:min-h-[500px] ${
-              product.bg_color === 'bg-white' ? 'bg-pink-50' : product.bg_color
-            } flex items-center justify-center relative overflow-hidden rounded-t-3xl md:rounded-l-3xl md:rounded-tr-none`}
+          <div className="relative">
+            <User size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Nama Anda *"
+              value={customerName}
+              onChange={(e) => setCustomerName(e.target.value)}
+              className="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-lg text-sm focus:border-pink-500 focus:ring-2 focus:ring-pink-200 outline-none"
+            />
+          </div>
+          <div className="relative">
+            <Phone size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            <input
+              type="tel"
+              placeholder="No. HP / WhatsApp (opsional)"
+              value={customerPhone}
+              onChange={(e) => setCustomerPhone(e.target.value)}
+              className="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-lg text-sm focus:border-pink-500 focus:ring-2 focus:ring-pink-200 outline-none"
+            />
+          </div>
+          <div className="relative">
+            <FileText size={16} className="absolute left-3 top-3 text-gray-400" />
+            <textarea
+              rows={2}
+              placeholder="Catatan (opsional)"
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              className="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-lg text-sm focus:border-pink-500 focus:ring-2 focus:ring-pink-200 outline-none resize-none"
+            />
+          </div>
+          <button
+            onClick={handleOrderSubmit}
+            disabled={submitting || !customerName.trim()}
+            className="w-full bg-gray-800 text-white font-medium py-3 rounded-xl shadow-lg hover:bg-pink-600 transition-all duration-300 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <div className="absolute inset-0 bg-white/10"></div>
-            {product.image_url ? (
-              <Image
-                src={product.image_url}
-                alt={product.name}
-                fill
-                className="object-cover"
-                sizes="(max-width: 768px) 100vw, 50vw"
-              />
-            ) : (
-              <Heart
-                className={`${product.icon_color} opacity-60 animate-pulse-slow`}
-                size={180}
-                fill="currentColor"
-              />
-            )}
+            <MessageCircle size={20} />
+            <span>{submitting ? 'Memproses...' : 'Lanjut ke WhatsApp'}</span>
+          </button>
+        </div>
+      ) : (
+        <button
+          onClick={() => setShowOrderForm(true)}
+          className="w-full bg-gray-800 text-white font-medium py-4 rounded-xl shadow-xl shadow-gray-200 hover:bg-pink-600 hover:shadow-pink-200 transition-all duration-300 flex items-center justify-center gap-3 transform hover:-translate-y-1"
+        >
+          <MessageCircle size={20} />
+          <span>Cek Harga & Pesan via WhatsApp</span>
+        </button>
+      )}
+    </div>
+  );
 
-            {/* Decorative Blobs */}
-            <div className="absolute top-10 right-10 w-20 h-20 bg-white/20 rounded-full blur-xl"></div>
-            <div className="absolute bottom-10 left-10 w-32 h-32 bg-white/20 rounded-full blur-xl"></div>
-          </div>
-
-          {/* RIGHT: INFO SECTION */}
-          <div className="w-full md:w-1/2 p-6 md:p-10 flex flex-col justify-center bg-[#FFF8F8] rounded-b-3xl md:rounded-r-3xl md:rounded-bl-none">
-            {/* Breadcrumb / Meta */}
-            <div className="flex items-center gap-2 mb-4">
-              {product.category && (
-                <span className="bg-pink-100 text-pink-600 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-widest">
-                  {product.category.name || product.category}
-                </span>
-              )}
-              <div className="flex items-center gap-1 text-yellow-500">
-                <Star size={12} fill="currentColor" />
-                <span className="text-xs font-bold">{product.rating}</span>
-              </div>
-              <span className="text-xs text-gray-400">• {product.sold_count} terjual</span>
-            </div>
-
-            <h1 className="font-serif text-3xl md:text-4xl text-gray-800 mb-6 leading-tight">
-              {product.name}
-            </h1>
-
-            {/* Info Box */}
-            <div className="bg-white border border-pink-100 rounded-xl p-4 flex items-start gap-4 mb-8 shadow-sm">
-              <div className="bg-pink-50 p-2 rounded-full text-pink-500">
-                <MessageSquare size={20} />
-              </div>
-              <div>
-                <p className="text-sm font-bold text-gray-700">Harga Spesial (By Request)</p>
-                <p className="text-xs text-gray-500 mt-1 leading-relaxed">
-                  Harga menyesuaikan dengan kustomisasi. Hubungi kami untuk penawaran terbaik.
-                </p>
-              </div>
-            </div>
-
-            {/* Description */}
-            <div className="mb-8">
-              <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">
-                Keterangan Produk
-              </h3>
-              <p className="text-gray-600 text-sm md:text-base leading-relaxed font-light">
-                {product.description}
-              </p>
-            </div>
-
-            {/* Customization */}
-            {paperColors.length > 0 && (
-              <div className="mb-8">
-                <ColorPicker
-                  colors={paperColors}
-                  selectedColor={paperColor}
-                  onColorChange={setPaperColor}
-                />
-              </div>
-            )}
-
-            {/* Rating Interaction */}
-            <div className="mb-8 pt-6 border-t border-gray-100">
-              <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 text-center md:text-left">
-                Berikan Penilaian
-              </h3>
-              <div className="flex justify-center md:justify-start">
-                <RatingStars rating={userRating} onRatingChange={handleRatingChange} />
-              </div>
-              {ratingSubmitted && (
-                <p className="text-xs text-green-500 mt-2 font-medium animate-pulse text-center md:text-left">
-                  Terima kasih atas penilaian Anda!
-                </p>
-              )}
-            </div>
-
-            {/* Order Form (inline) */}
-            {showOrderForm ? (
-              <div className="border border-pink-200 rounded-xl p-4 mb-4 bg-white space-y-3">
-                <div className="flex items-center justify-between mb-1">
-                  <p className="text-sm font-bold text-gray-700">Data Pemesan</p>
-                  <button onClick={() => setShowOrderForm(false)} className="text-gray-400 hover:text-red-500 transition-colors">
-                    <X size={18} />
-                  </button>
-                </div>
-                <div className="relative">
-                  <User size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                  <input
-                    type="text"
-                    placeholder="Nama Anda *"
-                    value={customerName}
-                    onChange={(e) => setCustomerName(e.target.value)}
-                    className="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-lg text-sm focus:border-pink-500 focus:ring-2 focus:ring-pink-200 outline-none"
-                  />
-                </div>
-                <button
-                  onClick={handleOrderSubmit}
-                  disabled={submitting || !customerName.trim()}
-                  className="w-full bg-gray-800 text-white font-medium py-3 rounded-xl shadow-lg hover:bg-pink-600 transition-all duration-300 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <MessageCircle size={20} />
-                  <span>{submitting ? 'Memproses...' : 'Lanjut ke WhatsApp'}</span>
-                </button>
-              </div>
-            ) : (
+  if (onClose) {
+    return (
+      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
+        <div className="bg-white rounded-3xl shadow-2xl max-w-5xl w-full max-h-[90vh] overflow-y-auto relative animate-fade-in">
+          {/* Close Button - sticky zero-height overlay so it doesn't shift content */}
+          <div className="sticky top-0 left-0 right-0 h-0 overflow-visible z-10">
+            <div className="flex justify-end p-4">
               <button
-                onClick={() => setShowOrderForm(true)}
-                className="w-full bg-gray-800 text-white font-medium py-4 rounded-xl shadow-xl shadow-gray-200 hover:bg-pink-600 hover:shadow-pink-200 transition-all duration-300 flex items-center justify-center gap-3 transform hover:-translate-y-1"
+                onClick={onClose}
+                className="bg-white rounded-full p-2 shadow-lg hover:bg-gray-100 transition-colors"
               >
-                <MessageCircle size={20} />
-                <span>Cek Harga & Pesan via WhatsApp</span>
+                <X size={24} className="text-gray-600" />
               </button>
-            )}
+            </div>
+          </div>
+          <div className="flex flex-col md:flex-row">
+            {imageSection}
+            {infoSection}
           </div>
         </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="animate-fade-in max-w-5xl mx-auto">
+      <div className="bg-white md:rounded-3xl shadow-xl shadow-pink-100/50 overflow-hidden border border-pink-50 flex flex-col md:flex-row">
+        {imageSection}
+        {infoSection}
       </div>
     </div>
   );
