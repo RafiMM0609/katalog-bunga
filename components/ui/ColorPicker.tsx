@@ -36,7 +36,7 @@ export default function ColorPicker({
           <button
             key={item.name}
             onClick={() => onColorChange(item.name)}
-            className={`group relative w-10 h-10 md:w-12 md:h-12 rounded-full border-2 transition-all flex items-center justify-center ${
+            className={`group relative mb-6 md:mb-2 w-10 h-10 md:w-12 md:h-12 rounded-full border-2 transition-all flex items-center justify-center ${
               selectedColor === item.name
                 ? 'border-pink-500 scale-110 shadow-md'
                 : 'border-gray-200 hover:border-pink-300'
