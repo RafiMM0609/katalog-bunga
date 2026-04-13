@@ -9,7 +9,7 @@ export default function HeroSection() {
         <span className="inline-block bg-white/60 backdrop-blur-sm px-3 py-1 rounded-full text-pink-600 text-xs font-bold tracking-widest uppercase mb-4 shadow-sm">
           New Collection 2026
         </span>
-        <h2 className="font-serif text-3xl md:text-5xl text-gray-800 leading-tight mb-4">
+        <h2 className="playfair font-serif text-3xl md:text-5xl text-gray-800 leading-tight mb-4">
           Bunga Abadi <br />
           <span className="italic font-light text-pink-600">Penuh Makna.</span>
         </h2>
