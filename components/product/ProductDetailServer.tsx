@@ -34,7 +34,6 @@ export default function ProductDetailServer({ product }: ProductDetailServerProp
   // Order form state
   const [showOrderForm, setShowOrderForm] = useState(false);
   const [customerName, setCustomerName] = useState('');
-  const [customerPhone, setCustomerPhone] = useState('');
   const [notes, setNotes] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
@@ -67,7 +66,7 @@ export default function ProductDetailServer({ product }: ProductDetailServerProp
   };
 
   const handleOrderSubmit = async () => {
-    if (!customerName.trim() || !customerPhone.trim()) return;
+    if (!customerName.trim()) return;
 
     // Open a blank tab immediately while still in the user-gesture context so
     // Safari's popup blocker does not block the eventual WhatsApp redirect.
@@ -80,7 +79,6 @@ export default function ProductDetailServer({ product }: ProductDetailServerProp
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           customer_name: customerName.trim(),
-          customer_phone: customerPhone.trim(),
           product_id: product.id,
           selected_paper_color: paperColor || null,
           customer_rating: userRating || null,
@@ -94,7 +92,7 @@ export default function ProductDetailServer({ product }: ProductDetailServerProp
     }
 
     const whatsappNumber = siteConfig.whatsappNumber;
-    const message = `Halo Admin Kagitacraft, saya *${customerName.trim()}* tertarik dengan produk *${product.name}*.\n\nDetail Pilihan:\n- Warna Kertas: ${paperColor || '-'}\n- No HP: ${customerPhone.trim()}\n${notes.trim() ? `- Catatan: ${notes.trim()}\n` : ''}\nBoleh tolong infonya kak? Terima kasih.`;
+    const message = `Halo Admin Kagitacraft, saya *${customerName.trim()}* tertarik dengan produk *${product.name}*.\n\nDetail Pilihan:\n- Warna Kertas: ${paperColor || '-'}\n${notes.trim() ? `- Catatan: ${notes.trim()}\n` : ''}\nBoleh tolong infonya kak? Terima kasih.`;
     const encodedMessage = encodeURIComponent(message);
     const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
     if (waWindow) {
@@ -226,16 +224,6 @@ export default function ProductDetailServer({ product }: ProductDetailServerProp
                 />
               </div>
               <div className="relative">
-                <Phone size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                <input
-                  type="tel"
-                  placeholder="No. HP / WhatsApp *"
-                  value={customerPhone}
-                  onChange={(e) => setCustomerPhone(e.target.value)}
-                  className="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-lg text-sm focus:border-pink-500 focus:ring-2 focus:ring-pink-200 outline-none"
-                />
-              </div>
-              <div className="relative">
                 <FileText size={16} className="absolute left-3 top-3 text-gray-400" />
                 <textarea
                   rows={2}
@@ -247,7 +235,7 @@ export default function ProductDetailServer({ product }: ProductDetailServerProp
               </div>
               <button
                 onClick={handleOrderSubmit}
-                disabled={submitting || !customerName.trim() || !customerPhone.trim()}
+                disabled={submitting || !customerName.trim()}
                 className="w-full bg-gray-800 text-white font-medium py-3 rounded-xl shadow-lg hover:bg-pink-600 transition-all duration-300 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <MessageCircle size={20} />
