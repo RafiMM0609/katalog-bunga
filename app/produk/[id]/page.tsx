@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
-import ProductDetailServer from '@/components/product/ProductDetailServer';
+import ProductDetailModal from '@/components/modals/ProductDetailModal';
 
 async function getProduct(id: string) {
   const { data, error } = await supabase
@@ -44,5 +44,5 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
   const { id } = await params;
   const product = await getProduct(id);
   
-  return <ProductDetailServer product={product} />;
+  return <ProductDetailModal product={product} />;
 }
