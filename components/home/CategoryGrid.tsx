@@ -25,14 +25,9 @@ const STEMMED_FLOWER_FRAMES = [
 const FLOWER_BG_CONFIG = {
   /** Total scroll distance (px) that maps to the full animation cycle */
   scrollRange: 400,
-  /** CSS position values – change these to move the flower */
-  bottom: "-40px",
-  right: "-20px",
   /** Rendered size (px) */
-  width: 220,
-  height: 220,
-  /** 0 = fully transparent, 1 = fully opaque */
-  opacity: 0.18,
+  width: 160,
+  height: 160,
   /** Clockwise rotation in degrees */
   rotation: -10,
 };
@@ -93,20 +88,19 @@ export default function CategoryGrid({ activeCategory: activeCategoryProp, onCha
   }
 
   return (
-    <div className="flex flex-col items-center relative overflow-hidden">
-      {/* Scroll-driven background flower */}
+    <div className="relative overflow-visible px-4 py-2">
+      {/* Flower decoration – sits in front of the visible border below (z-index higher) */}
       <div
         aria-hidden="true"
         className="absolute pointer-events-none select-none"
         style={{
-          bottom: FLOWER_BG_CONFIG.bottom,
-          right: FLOWER_BG_CONFIG.right,
+          top: "-36px",
+          right: "-16px",
           width: FLOWER_BG_CONFIG.width,
           height: FLOWER_BG_CONFIG.height,
-          opacity: FLOWER_BG_CONFIG.opacity,
+          zIndex: 20,
           transform: `rotate(${FLOWER_BG_CONFIG.rotation}deg)`,
           transition: "opacity 0.2s ease",
-          zIndex: 0,
         }}
       >
         <Image
@@ -118,34 +112,38 @@ export default function CategoryGrid({ activeCategory: activeCategoryProp, onCha
           draggable={false}
         />
       </div>
-      <h3 className="font-serif text-xl text-gray-800 mb-6 md:mb-8 text-center relative z-10">Telusuri Kategori</h3>
 
-      <div className="w-full flex gap-4 overflow-x-auto pb-4 md:pb-0 md:overflow-visible justify-start md:justify-center scrollbar-hide px-2 relative z-10">
-        {categories.map((cat) => {
-          const Icon = ICON_MAP[cat.icon_name] || Tag;
-          return (
-            <button
-              key={cat.id}
-              onClick={() => setActive(cat.id)}
-              className={`flex flex-col items-center gap-3 min-w-[80px] group transition-all duration-300 p-2 rounded-xl ${
-                activeCategory === cat.id ? "opacity-100 scale-105" : "opacity-60 hover:opacity-100"
-              }`}
-            >
-              <div
-                className={`w-14 h-14 md:w-16 md:h-16 neumorphic-circle transition-all ${
-                  activeCategory === cat.id
-                    ? "neumorphic-active text-white bg-rose-500"
-                    : "bg-white border border-pink-100 text-gray-400 group-hover:bg-pink-50"
+      {/* Inner visible bordered container – contains the actual category content */}
+      <div className="relative flex flex-col items-center border-2 border-pink-200 rounded-2xl bg-white/60 px-6 pt-6 pb-5 shadow-sm" style={{ zIndex: 1 }}>
+        <h3 className="font-serif text-xl text-gray-800 mb-6 md:mb-8 text-center">Telusuri Kategori</h3>
+
+        <div className="w-full flex gap-4 overflow-x-auto pb-4 md:pb-0 md:overflow-visible justify-start md:justify-center scrollbar-hide px-2">
+          {categories.map((cat) => {
+            const Icon = ICON_MAP[cat.icon_name] || Tag;
+            return (
+              <button
+                key={cat.id}
+                onClick={() => setActive(cat.id)}
+                className={`flex flex-col items-center gap-3 min-w-[80px] group transition-all duration-300 p-2 rounded-xl ${
+                  activeCategory === cat.id ? "opacity-100 scale-105" : "opacity-60 hover:opacity-100"
                 }`}
               >
-                <Icon size={24} strokeWidth={1.5} />
-              </div>
-              <span className={`text-xs md:text-sm font-medium ${activeCategory === cat.id ? "text-pink-600" : "text-gray-500"}`}>
-                {cat.name}
-              </span>
-            </button>
-          );
-        })}
+                <div
+                  className={`w-14 h-14 md:w-16 md:h-16 neumorphic-circle transition-all ${
+                    activeCategory === cat.id
+                      ? "neumorphic-active text-white bg-rose-500"
+                      : "bg-white border border-pink-100 text-gray-400 group-hover:bg-pink-50"
+                  }`}
+                >
+                  <Icon size={24} strokeWidth={1.5} />
+                </div>
+                <span className={`text-xs md:text-sm font-medium ${activeCategory === cat.id ? "text-pink-600" : "text-gray-500"}`}>
+                  {cat.name}
+                </span>
+              </button>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
