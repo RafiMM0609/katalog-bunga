@@ -72,6 +72,51 @@
       transform: translateY(-100%);
     }
   }
+
+  /* Music equalizer bars */
+  .eq-bar {
+    display: inline-block;
+    width: 3px;
+    border-radius: 2px;
+    background-color: currentColor;
+    animation: equalizerBar 0.9s ease-in-out infinite alternate;
+  }
+
+  .eq-bar-1 {
+    height: 10px;
+    animation-delay: 0ms;
+  }
+
+  .eq-bar-2 {
+    height: 18px;
+    animation-delay: 180ms;
+  }
+
+  .eq-bar-3 {
+    height: 12px;
+    animation-delay: 360ms;
+  }
+
+  @keyframes equalizerBar {
+    0% { transform: scaleY(0.3); }
+    100% { transform: scaleY(1); }
+  }
+
+  /* Welcome modal card entrance */
+  @keyframes modalIn {
+    from {
+      opacity: 0;
+      transform: scale(0.92) translateY(16px);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+  }
+
+  .animate-modal-in {
+    animation: modalIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  }
 }
 
 @layer components {

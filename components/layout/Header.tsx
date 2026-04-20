@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ShoppingBag, Search, Menu } from "lucide-react";
 import Navigation from "./Navigation";
+import MusicToggleButton from "@/components/audio/MusicToggleButton";
 
 export default function Header() {
   return (
@@ -35,6 +36,7 @@ export default function Header() {
               <ShoppingBag size={22} className="text-gray-500 group-hover:text-pink-600 transition-colors" />
               <span className="absolute -top-1 -right-1 w-2 h-2 bg-pink-400 rounded-full animate-pulse"></span>
             </div>
+            <MusicToggleButton />
           </div>
         </div>
       </div>
