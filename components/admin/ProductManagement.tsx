@@ -34,7 +34,7 @@ export default function ProductManagement() {
 
   const fetchProducts = async () => {
     try {
-      const res = await fetch('/api/v1/produk');
+      const res = await fetch('/api/v1/admin/produk');
       if (res.ok) {
         const data = await res.json();
         setProducts(data.data || []);
