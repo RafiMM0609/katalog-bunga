@@ -279,10 +279,10 @@ export default function App() {
                       </div>
                       <h4 className="font-serif text-base md:text-lg text-gray-800 leading-tight mb-2 group-hover:text-pink-600 transition-colors line-clamp-2 min-h-[2.5em]">{item.name}</h4>
                       
-                      <div className="flex items-center justify-between pt-2 border-t border-gray-50 mt-2">
-                         <span className="text-xs font-bold text-pink-500 bg-pink-50 px-2 py-1 rounded-md group-hover:bg-pink-500 group-hover:text-white transition-colors">Tanya Admin</span>
-                         <div className="text-xs text-gray-400">{item.sold}+ terjual</div>
-                      </div>
+                       <div className="flex items-center justify-between flex-wrap gap-2 pt-2 border-t border-gray-50 mt-2">
+                         <span className="text-xs font-bold text-pink-500 bg-pink-50 px-2 py-1 rounded-md group-hover:bg-pink-500 group-hover:text-white transition-colors flex-shrink-0">Tanya Admin</span>
+                         <div className="text-xs text-gray-400 flex-shrink-0 w-full sm:w-auto mt-1 sm:mt-0">{item.sold}+ terjual</div>
+                       </div>
                     </div>
                   </div>
                 ))}
