@@ -71,8 +71,8 @@ export default function ProductCard({ product }: ProductCardProps) {
             {product.name}
           </h4>
 
-          <div className="flex items-center justify-between pt-2 border-t border-gray-50 mt-2">
-            <span className="text-xs font-bold text-pink-500 bg-pink-50 px-2 py-1 rounded-md group-hover:bg-pink-500 group-hover:text-white transition-colors">
+          <div className="flex items-center justify-between gap-x-2 pt-2 border-t border-gray-50 mt-2">
+            <span className="text-xs text-center font-bold text-pink-500 bg-pink-50 px-2 py-1 rounded-md group-hover:bg-pink-500 group-hover:text-white transition-colors">
               Tanya Admin
             </span>
             <div className="text-xs text-gray-400">{product.sold_count}+ terjual</div>
