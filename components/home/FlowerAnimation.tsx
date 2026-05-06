@@ -133,6 +133,7 @@ export default function FlowerAnimation() {
             transform: `scale(${imgScale}) rotate(${imgRotation}deg)`,
             transition: `transform ${FRAME_DURATION - 20}ms ease-out, box-shadow ${FRAME_DURATION - 20}ms ease-out`,
           }}
+          unoptimized
           priority
         />
       </div>

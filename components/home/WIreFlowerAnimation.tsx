@@ -139,6 +139,7 @@ export default function WireFlowerAnimation() {
             transition: `transform ${FRAME_DURATION - 20}ms ease-out, box-shadow ${FRAME_DURATION - 20}ms ease-out`,
             objectPosition: "50% 45%",
           }}
+          unoptimized
           priority
         />
       </div>

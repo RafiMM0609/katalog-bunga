@@ -119,6 +119,7 @@ export default function ProductDetailModal({ product, onClose }: ProductDetailMo
           className="object-cover"
           sizes="(max-width: 768px) 100vw, 50vw"
           priority={!onClose}
+          unoptimized
         />
       ) : (
         <Heart
@@ -170,7 +171,7 @@ export default function ProductDetailModal({ product, onClose }: ProductDetailMo
       </div>
 
       {/* Description */}
-      <div className="mb-8">
+      <div className="mb-8 order-5 md:order-none">
         <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">
           Keterangan Produk
         </h3>
@@ -181,7 +182,7 @@ export default function ProductDetailModal({ product, onClose }: ProductDetailMo
 
       {/* Customization */}
       {paperColors.length > 0 && (
-        <div className="mb-8">
+        <div className="mb-8 order-6 md:order-none">
           <ColorPicker
             colors={paperColors}
             selectedColor={paperColor}
@@ -191,7 +192,7 @@ export default function ProductDetailModal({ product, onClose }: ProductDetailMo
       )}
 
       {/* Rating Interaction */}
-      <div className="mb-8 pt-6 border-t border-gray-100">
+      <div className="mb-8 pt-6 border-t border-gray-100 order-7 md:order-none">
         <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 text-center md:text-left">
           Berikan Penilaian
         </h3>
@@ -206,6 +207,7 @@ export default function ProductDetailModal({ product, onClose }: ProductDetailMo
       </div>
 
       {/* Order Form (inline) */}
+      <div className="order-4 md:order-none mb-4 md:mb-0">
       {showOrderForm ? (
         <div className="border border-pink-200 rounded-xl p-4 mb-4 bg-white space-y-3">
           <div className="flex items-center justify-between mb-1">
@@ -252,6 +254,7 @@ export default function ProductDetailModal({ product, onClose }: ProductDetailMo
           <span>Cek Harga & Pesan via WhatsApp</span>
         </button>
       )}
+      </div>
     </div>
   );
 

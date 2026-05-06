@@ -116,6 +116,7 @@ export default function CategoryGrid({ activeCategory: activeCategoryProp, onCha
           height={FLOWER_BG_CONFIG.height}
           className="object-cover rounded-full w-full h-full"
           draggable={false}
+          unoptimized
         />
       </div>
       <h3 className="font-serif text-xl text-gray-800 mb-6 md:mb-8 text-center relative z-10">Telusuri Kategori</h3>
