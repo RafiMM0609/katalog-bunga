@@ -1,4 +1,3 @@
-import Link from "next/link";
 // import FlowerAnimation from "@/components/home/FlowerAnimation";
 import WireFlowerAnimation from "@/components/home/WIreFlowerAnimation";
 
@@ -16,12 +15,12 @@ export default function HeroSection() {
         <p className="text-gray-600 mb-6 text-sm md:text-base max-w-sm mx-auto md:mx-0">
           Temukan hadiah spesial yang tak akan pernah layu untuk momen terbaikmu.
         </p>
-        <Link
-          href="/katalog"
+        <a
+          href="#catalog-section"
           className="inline-block bg-gray-800 text-white px-6 py-3 rounded-full text-sm font-medium hover:bg-pink-600 hover:shadow-lg hover:shadow-pink-200 transition-all transform hover:-translate-y-1"
         >
           Lihat Katalog
-        </Link>
+        </a>
       </div>
 
       {/* Decorative Element */}
