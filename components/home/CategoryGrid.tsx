@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import { motion } from "framer-motion";
 import {
   ShoppingBag,
   Heart,
@@ -93,19 +94,19 @@ export default function CategoryGrid({ activeCategory: activeCategoryProp, onCha
   }
 
   return (
-    <div className="flex flex-col items-center relative overflow-hidden">
+    <div className="flex flex-col items-center relative overflow-hidden py-4">
       {/* Scroll-driven background flower */}
-      <div
+      <motion.div
         aria-hidden="true"
         className="absolute pointer-events-none select-none"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: FLOWER_BG_CONFIG.opacity }}
         style={{
           bottom: FLOWER_BG_CONFIG.bottom,
           right: FLOWER_BG_CONFIG.right,
           width: FLOWER_BG_CONFIG.width,
           height: FLOWER_BG_CONFIG.height,
-          opacity: FLOWER_BG_CONFIG.opacity,
           transform: `rotate(${FLOWER_BG_CONFIG.rotation}deg)`,
-          transition: "opacity 0.2s ease",
           zIndex: 0,
         }}
       >
@@ -118,33 +119,54 @@ export default function CategoryGrid({ activeCategory: activeCategoryProp, onCha
           draggable={false}
           unoptimized
         />
-      </div>
-      <h3 className="font-serif text-xl text-gray-800 mb-6 md:mb-8 text-center relative z-10">Telusuri Kategori</h3>
+      </motion.div>
+
+      <motion.h3
+        initial={{ opacity: 0, y: 10 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        className="font-serif text-xl text-gray-800 mb-6 md:mb-8 text-center relative z-10"
+      >
+        Telusuri Kategori
+      </motion.h3>
 
       <div className="w-full flex gap-4 overflow-x-auto pb-4 md:pb-0 md:overflow-visible justify-start md:justify-center scrollbar-hide px-2 relative z-10">
         {categories.map((cat) => {
           const Icon = ICON_MAP[cat.icon_name] || Tag;
+          const isActive = activeCategory === cat.id;
+
           return (
-            <button
+            <motion.button
               key={cat.id}
               onClick={() => setActive(cat.id)}
-              className={`flex flex-col items-center gap-3 min-w-[80px] group transition-all duration-300 p-2 rounded-xl ${
-                activeCategory === cat.id ? "opacity-100 scale-105" : "opacity-60 hover:opacity-100"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className={`flex flex-col items-center gap-3 min-w-[80px] group transition-opacity duration-300 p-2 rounded-xl ${
+                isActive ? "opacity-100" : "opacity-60 hover:opacity-100"
               }`}
             >
               <div
-                className={`w-14 h-14 md:w-16 md:h-16 neumorphic-circle transition-all ${
-                  activeCategory === cat.id
+                className={`w-14 h-14 md:w-16 md:h-16 neumorphic-circle transition-all relative ${
+                  isActive
                     ? "neumorphic-active text-white bg-rose-500"
                     : "bg-white border border-pink-100 text-gray-400 group-hover:bg-pink-50"
                 }`}
               >
                 <Icon size={24} strokeWidth={1.5} />
+
+                {/* Active Indicator Backdrop */}
+                {isActive && (
+                  <motion.div
+                    layoutId="active-category"
+                    className="absolute inset-0 bg-rose-500 rounded-full -z-10"
+                    transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                  />
+                )}
               </div>
-              <span className={`text-xs md:text-sm font-medium ${activeCategory === cat.id ? "text-pink-600" : "text-gray-500"}`}>
+              <span className={`text-xs md:text-sm font-medium ${isActive ? "text-pink-600" : "text-gray-500"}`}>
                 {cat.name}
               </span>
-            </button>
+            </motion.button>
           );
         })}
       </div>
