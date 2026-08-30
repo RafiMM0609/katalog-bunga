@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ShoppingBag, Search, Menu } from "lucide-react";
+import { ShoppingBag, Search } from "lucide-react";
 import Navigation from "./Navigation";
 import MusicToggleButton from "@/components/audio/MusicToggleButton";
 
@@ -10,10 +10,7 @@ export default function Header() {
         <div className="flex justify-between items-center h-16">
           
           {/* Left: Logo */}
-          <div className="flex items-center gap-3">
-            <button className="md:hidden p-2 -ml-2 text-gray-500">
-              <Menu size={22} />
-            </button>
+          <div className="flex items-center">
             <Link
               href="/"
               aria-label="Kagitacraft."

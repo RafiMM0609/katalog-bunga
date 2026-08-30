@@ -208,10 +208,20 @@ export default function ProductDetailModal({ product, onClose }: ProductDetailMo
       {/* Order Form (inline) */}
       <div className="order-4 md:order-none mb-4 md:mb-0">
       {showOrderForm ? (
-        <div className="border border-pink-200 rounded-xl p-4 mb-4 bg-white space-y-3">
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleOrderSubmit();
+          }}
+          className="border border-pink-200 rounded-xl p-4 mb-4 bg-white space-y-3"
+        >
           <div className="flex items-center justify-between mb-1">
             <p className="text-sm font-bold text-gray-700">Data Pemesan</p>
-            <button onClick={() => setShowOrderForm(false)} className="text-gray-400 hover:text-red-500 transition-colors">
+            <button
+              type="button"
+              onClick={() => setShowOrderForm(false)}
+              className="text-gray-400 hover:text-red-500 transition-colors"
+            >
               <X size={18} />
             </button>
           </div>
@@ -222,7 +232,8 @@ export default function ProductDetailModal({ product, onClose }: ProductDetailMo
               placeholder="Nama Anda *"
               value={customerName}
               onChange={(e) => setCustomerName(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-lg text-sm focus:border-pink-500 focus:ring-2 focus:ring-pink-200 outline-none"
+              className="w-full pl-9 pr-3 py-2.5 border border-gray-200 rounded-lg text-base md:text-sm focus:border-pink-500 focus:ring-2 focus:ring-pink-200 outline-none"
+              autoFocus
             />
           </div>
           {/* <div className="relative">
@@ -232,18 +243,18 @@ export default function ProductDetailModal({ product, onClose }: ProductDetailMo
               placeholder="Catatan (opsional)"
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-lg text-sm focus:border-pink-500 focus:ring-2 focus:ring-pink-200 outline-none resize-none"
+              className="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-lg text-base md:text-sm focus:border-pink-500 focus:ring-2 focus:ring-pink-200 outline-none resize-none"
             />
           </div> */}
           <button
-            onClick={handleOrderSubmit}
+            type="submit"
             disabled={submitting || !customerName.trim()}
             className="w-full bg-gray-800 text-white font-medium py-3 rounded-xl shadow-lg hover:bg-pink-600 transition-all duration-300 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <MessageCircle size={20} />
             <span>{submitting ? 'Memproses...' : 'Lanjut ke WhatsApp'}</span>
           </button>
-        </div>
+        </form>
       ) : (
         <button
           onClick={() => setShowOrderForm(true)}
