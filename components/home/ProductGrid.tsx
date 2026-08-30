@@ -1,19 +1,21 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import ProductCard from "@/components/ui/ProductCard";
 import type { Product, PaginatedResponse } from "@/lib/types";
 
 type Props = {
   filterCategory?: string;
+  initialProducts?: PaginatedResponse<Product>;
 };
 
-export default function ProductGrid({ filterCategory }: Props) {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [total, setTotal] = useState(0);
-  const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [loading, setLoading] = useState(true);
+export default function ProductGrid({ filterCategory, initialProducts }: Props) {
+  const [products, setProducts] = useState<Product[]>(initialProducts?.data ?? []);
+  const [total, setTotal] = useState(initialProducts?.total ?? 0);
+  const [page, setPage] = useState(initialProducts?.page ?? 1);
+  const [totalPages, setTotalPages] = useState(initialProducts?.total_pages ?? 1);
+  const [loading, setLoading] = useState(!initialProducts);
+  const isInitialMount = useRef(true);
 
   const fetchProducts = useCallback(async (cat: string, pg: number) => {
     setLoading(true);
@@ -36,9 +38,16 @@ export default function ProductGrid({ filterCategory }: Props) {
   }, []);
 
   useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      if (initialProducts) {
+        return;
+      }
+    }
+
     setPage(1);
     fetchProducts(filterCategory || 'all', 1);
-  }, [filterCategory, fetchProducts]);
+  }, [filterCategory, fetchProducts, initialProducts]);
 
   const handlePageChange = (newPage: number) => {
     setPage(newPage);

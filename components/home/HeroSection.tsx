@@ -1,6 +1,5 @@
 import Link from "next/link";
-// import FlowerAnimation from "@/components/home/FlowerAnimation";
-import WireFlowerAnimation from "@/components/home/WIreFlowerAnimation";
+import WireFlowerAnimation from "@/components/home/WireFlowerAnimation";
 
 export default function HeroSection() {
   return (
@@ -27,7 +26,6 @@ export default function HeroSection() {
       {/* Decorative Element */}
       <div className="absolute top-0 right-0 w-64 h-64 bg-white/30 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>
       <div className="relative md:w-1/3 flex justify-center">
-        {/* <FlowerAnimation /> */}
         <WireFlowerAnimation />
       </div>
     </div>

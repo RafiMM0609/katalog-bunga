@@ -4,14 +4,19 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 
 const REAL_FRAMES = [
-  "/hero-animate-flower/Animasi_Bunga_Mekar_Dari_Daun_001.jpg",
-  "/hero-animate-flower/Animasi_Bunga_Mekar_Dari_Daun_002.jpg",
-  "/hero-animate-flower/Animasi_Bunga_Mekar_Dari_Daun_003.jpg",
-  "/hero-animate-flower/Animasi_Bunga_Mekar_Dari_Daun_004.jpg",
-  "/hero-animate-flower/Animasi_Bunga_Mekar_Dari_Daun_005.jpg",
-  "/hero-animate-flower/Animasi_Bunga_Mekar_Dari_Daun_006.jpg",
-  "/hero-animate-flower/Animasi_Bunga_Mekar_Dari_Daun_007.jpg",
-  "/hero-animate-flower/Animasi_Bunga_Mekar_Dari_Daun_008.jpg",
+  "/hero-animate-wire-flower/Ubah_Background_Video_Pink_Soft_001.jpg",
+  "/hero-animate-wire-flower/Ubah_Background_Video_Pink_Soft_002.jpg",
+  "/hero-animate-wire-flower/Ubah_Background_Video_Pink_Soft_003.jpg",
+  "/hero-animate-wire-flower/Ubah_Background_Video_Pink_Soft_004.jpg",
+  "/hero-animate-wire-flower/Ubah_Background_Video_Pink_Soft_005.jpg",
+  "/hero-animate-wire-flower/Ubah_Background_Video_Pink_Soft_006.jpg",
+  "/hero-animate-wire-flower/Ubah_Background_Video_Pink_Soft_007.jpg",
+  "/hero-animate-wire-flower/Ubah_Background_Video_Pink_Soft_008.jpg",
+  "/hero-animate-wire-flower/Ubah_Background_Video_Pink_Soft_009.jpg",
+  "/hero-animate-wire-flower/Ubah_Background_Video_Pink_Soft_010.jpg",
+  "/hero-animate-wire-flower/Ubah_Background_Video_Pink_Soft_011.jpg",
+  "/hero-animate-wire-flower/Ubah_Background_Video_Pink_Soft_012.jpg",
+  "/hero-animate-wire-flower/Ubah_Background_Video_Pink_Soft_013.jpg",
 ];
 
 // Virtual "burst-out" frames shown after full bloom.
@@ -34,7 +39,7 @@ const TOTAL_FRAMES = N_REAL;
 // Slightly longer than the original 180 ms so burst frames feel deliberate
 const FRAME_DURATION = 200; // ms per frame
 
-export default function FlowerAnimation() {
+export default function WireFlowerAnimation() {
   const [frame, setFrame] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -69,8 +74,13 @@ export default function FlowerAnimation() {
     }, FRAME_DURATION);
   };
 
-  // Auto-play on mount, loop continuously
+  // Auto-play on mount, loop continuously & preload frames
   useEffect(() => {
+    REAL_FRAMES.forEach((src) => {
+      const img = new window.Image();
+      img.src = src;
+    });
+
     startAnimation();
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
@@ -132,15 +142,11 @@ export default function FlowerAnimation() {
                 : "0 8px 20px rgba(0,0,0,0.15)",
             transform: `scale(${imgScale}) rotate(${imgRotation}deg)`,
             transition: `transform ${FRAME_DURATION - 20}ms ease-out, box-shadow ${FRAME_DURATION - 20}ms ease-out`,
+            objectPosition: "50% 45%",
           }}
-          unoptimized
           priority
         />
       </div>
-
-      <span className="absolute bottom-2 right-2 bg-white/70 backdrop-blur-sm rounded-full px-2 py-0.5 text-xs text-pink-600 font-medium shadow pointer-events-none z-20">
-        {isPlaying ? "🌸 Mekar..." : "🌺 Klik untuk putar ulang"}
-      </span>
     </div>
   );
 }

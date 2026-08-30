@@ -1,17 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
+import { getCategories } from '@/lib/data';
 
 // GET /api/v1/kategori - List all categories
 export async function GET(request: NextRequest) {
   try {
-    const { data, error } = await supabase
-      .from('categories')
-      .select('*')
-      .order('name', { ascending: true });
+    const categories = await getCategories();
 
-    if (error) throw error;
-
-    return NextResponse.json(data ?? []);
+    return NextResponse.json(categories, {
+      headers: {
+        'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600',
+      },
+    });
   } catch (error) {
     console.error('GET /api/v1/kategori error:', error);
     return NextResponse.json({ error: 'Failed to fetch categories' }, { status: 500 });

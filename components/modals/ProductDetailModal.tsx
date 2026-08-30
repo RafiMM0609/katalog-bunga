@@ -119,7 +119,6 @@ export default function ProductDetailModal({ product, onClose }: ProductDetailMo
           className="object-cover"
           sizes="(max-width: 768px) 100vw, 50vw"
           priority={!onClose}
-          unoptimized
         />
       ) : (
         <Heart

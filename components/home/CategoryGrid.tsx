@@ -1,7 +1,6 @@
 "use client"
 
 import { useState, useEffect } from "react";
-import Image from "next/image";
 import {
   ShoppingBag,
   Heart,
@@ -12,30 +11,7 @@ import {
   Tag,
 } from "lucide-react";
 import type { Category } from "@/lib/types";
-
-// --- Scroll-driven background flower animation ---
-// All position / size / appearance values are centralised here for easy tuning.
-const STEMMED_FLOWER_FRAMES = [
-  "/animate-stemmed-flower/Animasi_Bunga_Terkumpul_Menjadi_Satu_001.jpg",
-  "/animate-stemmed-flower/Animasi_Bunga_Terkumpul_Menjadi_Satu_002.jpg",
-  "/animate-stemmed-flower/Animasi_Bunga_Terkumpul_Menjadi_Satu_003.jpg",
-  "/animate-stemmed-flower/Animasi_Bunga_Terkumpul_Menjadi_Satu_004.jpg",
-];
-
-const FLOWER_BG_CONFIG = {
-  /** Total scroll distance (px) that maps to the full animation cycle */
-  scrollRange: 400,
-  /** CSS position values – change these to move the flower */
-  bottom: "-40px",
-  right: "-20px",
-  /** Rendered size (px) */
-  width: 220,
-  height: 220,
-  /** 0 = fully transparent, 1 = fully opaque */
-  opacity: 0.18,
-  /** Clockwise rotation in degrees */
-  rotation: -10,
-};
+import BackgroundFlowerAnimation from "@/components/home/BackgroundFlowerAnimation";
 
 const ICON_MAP: Record<string, React.ElementType> = {
   ShoppingBag,
@@ -52,40 +28,46 @@ const ALL_CATEGORY = { id: "all", name: "Semua", slug: "all", icon_name: "Shoppi
 type Props = {
   activeCategory?: string;
   onChange?: (catSlug: string) => void;
+  initialCategories?: Category[];
 };
 
-export default function CategoryGrid({ activeCategory: activeCategoryProp, onChange }: Props) {
+export default function CategoryGrid({
+  activeCategory: activeCategoryProp,
+  onChange,
+  initialCategories,
+}: Props) {
   const [localActive, setLocalActive] = useState("all");
-  const [categories, setCategories] = useState<typeof ALL_CATEGORY[]>([ALL_CATEGORY]);
-  const [flowerFrame, setFlowerFrame] = useState(0);
+
+  const buildCategoryList = (cats?: Category[]) => [
+    ALL_CATEGORY,
+    ...(cats || []).map((c) => ({
+      id: c.slug,
+      name: c.name,
+      slug: c.slug,
+      icon_name: c.icon_name || "Tag",
+    })),
+  ];
+
+  const [categories, setCategories] = useState<typeof ALL_CATEGORY[]>(
+    buildCategoryList(initialCategories)
+  );
 
   useEffect(() => {
-    fetch('/api/v1/kategori')
-      .then((res) => res.ok ? res.json() : [])
+    if (initialCategories && initialCategories.length > 0) {
+      setCategories(buildCategoryList(initialCategories));
+      return;
+    }
+
+    fetch("/api/v1/kategori")
+      .then((res) => (res.ok ? res.json() : []))
       .then((data: Category[]) => {
-        setCategories([
-          ALL_CATEGORY,
-          ...data.map((c) => ({ id: c.slug, name: c.name, slug: c.slug, icon_name: c.icon_name || 'Tag' })),
-        ]);
+        setCategories(buildCategoryList(data));
       })
       .catch(() => {/* keep default "Semua" */});
-  }, []);
+  }, [initialCategories]);
 
-  // Sync animation frame with scroll position
-  useEffect(() => {
-    const handleScroll = () => {
-      const scrollY = window.scrollY;
-      const progress = Math.min(scrollY / FLOWER_BG_CONFIG.scrollRange, 1);
-      const frame = Math.round(progress * (STEMMED_FLOWER_FRAMES.length - 1));
-      setFlowerFrame((prev) => (prev !== frame ? frame : prev));
-    };
-
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    handleScroll(); // set initial frame
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  const activeCategory = typeof activeCategoryProp !== "undefined" ? activeCategoryProp : localActive;
+  const activeCategory =
+    typeof activeCategoryProp !== "undefined" ? activeCategoryProp : localActive;
 
   function setActive(catSlug: string) {
     if (onChange) onChange(catSlug);
@@ -94,32 +76,12 @@ export default function CategoryGrid({ activeCategory: activeCategoryProp, onCha
 
   return (
     <div className="flex flex-col items-center relative overflow-hidden">
-      {/* Scroll-driven background flower */}
-      <div
-        aria-hidden="true"
-        className="absolute pointer-events-none select-none"
-        style={{
-          bottom: FLOWER_BG_CONFIG.bottom,
-          right: FLOWER_BG_CONFIG.right,
-          width: FLOWER_BG_CONFIG.width,
-          height: FLOWER_BG_CONFIG.height,
-          opacity: FLOWER_BG_CONFIG.opacity,
-          transform: `rotate(${FLOWER_BG_CONFIG.rotation}deg)`,
-          transition: "opacity 0.2s ease",
-          zIndex: 0,
-        }}
-      >
-        <Image
-          src={STEMMED_FLOWER_FRAMES[flowerFrame]}
-          alt=""
-          width={FLOWER_BG_CONFIG.width}
-          height={FLOWER_BG_CONFIG.height}
-          className="object-cover rounded-full w-full h-full"
-          draggable={false}
-          unoptimized
-        />
-      </div>
-      <h3 className="font-serif text-xl text-gray-800 mb-6 md:mb-8 text-center relative z-10">Telusuri Kategori</h3>
+      {/* Throttled background animation isolated to prevent CategoryGrid re-renders */}
+      <BackgroundFlowerAnimation />
+
+      <h3 className="font-serif text-xl text-gray-800 mb-6 md:mb-8 text-center relative z-10">
+        Telusuri Kategori
+      </h3>
 
       <div className="w-full flex gap-4 overflow-x-auto pb-4 md:pb-0 md:overflow-visible justify-start md:justify-center scrollbar-hide px-2 relative z-10">
         {categories.map((cat) => {
@@ -141,7 +103,11 @@ export default function CategoryGrid({ activeCategory: activeCategoryProp, onCha
               >
                 <Icon size={24} strokeWidth={1.5} />
               </div>
-              <span className={`text-xs md:text-sm font-medium ${activeCategory === cat.id ? "text-pink-600" : "text-gray-500"}`}>
+              <span
+                className={`text-xs md:text-sm font-medium ${
+                  activeCategory === cat.id ? "text-pink-600" : "text-gray-500"
+                }`}
+              >
                 {cat.name}
               </span>
             </button>

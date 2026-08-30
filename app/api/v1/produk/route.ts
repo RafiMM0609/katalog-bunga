@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 import { paginationConfig } from '@/lib/config';
+import { getProducts } from '@/lib/data';
 
 // GET /api/v1/produk - List all products with pagination and filtering
 export async function GET(request: NextRequest) {
@@ -10,35 +11,13 @@ export async function GET(request: NextRequest) {
     const page = parseInt(searchParams.get('page') || String(paginationConfig.defaultPage));
     const per_page = parseInt(searchParams.get('per_page') || String(paginationConfig.defaultPerPage));
 
-    let query = supabase
-      .from('products')
-      .select('*, category:categories(*)', { count: 'exact' })
-      .eq('is_active', true)
-      .order('created_at', { ascending: false });
+    const result = await getProducts(category || undefined, page, per_page);
 
-    if (category && category !== 'all') {
-      const { data: cat } = await supabase
-        .from('categories')
-        .select('id')
-        .eq('slug', category)
-        .single();
-      if (cat) {
-        query = query.eq('category_id', cat.id);
-      }
-    }
-
-    const from = (page - 1) * per_page;
-    const to = from + per_page - 1;
-    query = query.range(from, to);
-
-    const { data, error, count } = await query;
-
-    if (error) throw error;
-
-    const total = count ?? 0;
-    const total_pages = Math.ceil(total / per_page);
-
-    return NextResponse.json({ total, page, per_page, total_pages, data: data ?? [] });
+    return NextResponse.json(result, {
+      headers: {
+        'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
+      },
+    });
   } catch (error) {
     console.error('GET /api/v1/produk error:', error);
     return NextResponse.json({ error: 'Failed to fetch products' }, { status: 500 });

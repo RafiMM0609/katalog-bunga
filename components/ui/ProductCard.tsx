@@ -32,7 +32,6 @@ export default function ProductCard({ product }: ProductCardProps) {
               className="object-cover"
               sizes="(max-width: 768px) 50vw, 25vw"
               loading="lazy"
-              unoptimized
             />
           ) : (
             <Heart
