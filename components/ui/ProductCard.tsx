@@ -3,14 +3,16 @@
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { Heart, Star } from "lucide-react";
+import { Heart, Star, ShoppingBag } from "lucide-react";
 import type { Product } from "@/lib/types";
+import { useCart } from "@/context/CartContext";
 
 interface ProductCardProps {
   product: Product;
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
+  const { addToCart } = useCart();
   const tagsArray = product.tags ? product.tags.split(',').map(t => t.trim()).slice(0, 3) : [];
   const categoryName = product.category
     ? typeof product.category === 'string'
@@ -31,7 +33,7 @@ export default function ProductCard({ product }: ProductCardProps) {
       }}
     >
       <Link href={`/produk/${product.id}`}>
-        <div className="group cursor-pointer bg-white rounded-2xl p-3 md:p-4 shadow-sm hover:shadow-xl hover:shadow-pink-100/50 transition-all duration-300 border border-transparent hover:border-pink-100 h-full flex flex-col">
+        <div className="group cursor-pointer bg-white rounded-2xl p-3 md:p-4 shadow-sm hover:shadow-xl hover:shadow-pink-100/50 transition-all duration-300 border border-transparent hover:border-pink-100 h-full flex flex-col relative">
           {/* Image Area */}
           <div
             className={`aspect-[4/5] ${
@@ -68,6 +70,20 @@ export default function ProductCard({ product }: ProductCardProps) {
                 </span>
               ))}
             </div>
+
+            {/* Quick Add to Cart Button */}
+            <button
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                addToCart(product);
+              }}
+              title="Tambah ke Keranjang"
+              className="absolute bottom-2.5 right-2.5 p-2.5 bg-white/90 hover:bg-pink-600 text-gray-700 hover:text-white rounded-full shadow-md backdrop-blur-sm transition-all duration-300 transform hover:scale-110 active:scale-95 z-10"
+            >
+              <ShoppingBag size={15} />
+            </button>
           </div>
 
           {/* Info Area */}

@@ -25,7 +25,8 @@ export async function getCategories(): Promise<Category[]> {
 export async function getProducts(
   categorySlug?: string,
   page: number = 1,
-  perPage: number = 12
+  perPage: number = 12,
+  searchQuery?: string
 ): Promise<PaginatedResponse<Product>> {
   try {
     if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
@@ -37,6 +38,10 @@ export async function getProducts(
       .select('*, category:categories(*)', { count: 'exact' })
       .eq('is_active', true)
       .order('created_at', { ascending: false });
+
+    if (searchQuery && searchQuery.trim() !== '') {
+      query = query.ilike('name', `%${searchQuery.trim()}%`);
+    }
 
     if (categorySlug && categorySlug !== 'all') {
       const { data: cat } = await supabase

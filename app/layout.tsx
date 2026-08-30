@@ -3,6 +3,9 @@ import "./globals.css";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import AudioClientWrapper from "@/components/audio/AudioClientWrapper";
+import { CartProvider } from "@/context/CartContext";
+import CartDrawer from "@/components/cart/CartDrawer";
+import { Toaster } from "react-hot-toast";
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -69,15 +72,20 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
       </head>
       <body className="font-sans antialiased">
-        <AudioClientWrapper>
-          <Header />
-          <main className="pt-20 pb-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 min-h-screen">
-            {children}
-          </main>
-          {modal}
-          <Footer />
-        </AudioClientWrapper>
+        <CartProvider>
+          <AudioClientWrapper>
+            <Header />
+            <main className="pt-20 pb-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 min-h-screen">
+              {children}
+            </main>
+            {modal}
+            <Footer />
+          </AudioClientWrapper>
+          <CartDrawer />
+          <Toaster position="bottom-right" />
+        </CartProvider>
       </body>
     </html>
   );
 }
+

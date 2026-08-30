@@ -8,10 +8,11 @@ export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
     const category = searchParams.get('category');
+    const q = searchParams.get('q') || searchParams.get('search') || undefined;
     const page = parseInt(searchParams.get('page') || String(paginationConfig.defaultPage));
     const per_page = parseInt(searchParams.get('per_page') || String(paginationConfig.defaultPerPage));
 
-    const result = await getProducts(category || undefined, page, per_page);
+    const result = await getProducts(category || undefined, page, per_page, q);
 
     return NextResponse.json(result, {
       headers: {

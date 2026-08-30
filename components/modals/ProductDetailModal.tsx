@@ -2,24 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { X, Heart, MessageCircle, Star, MessageSquare, User, Phone, FileText } from 'lucide-react';
+import { X, Heart, MessageCircle, Star, MessageSquare, User, Phone, FileText, ShoppingBag } from 'lucide-react';
 import ColorPicker from '@/components/ui/ColorPicker';
 import RatingStars from '@/components/ui/RatingStars';
 import { siteConfig } from '@/lib/config';
-import type { PaperColor } from '@/lib/types';
-
-interface Product {
-  id: number;
-  name: string;
-  category?: any;
-  rating: number;
-  sold_count: number;
-  bg_color: string;
-  icon_color: string;
-  description: string;
-  tags?: string;
-  image_url?: string;
-}
+import type { PaperColor, Product } from '@/lib/types';
+import { useCart } from '@/context/CartContext';
 
 interface ProductDetailModalProps {
   product: Product;
@@ -31,6 +19,7 @@ export default function ProductDetailModal({ product, onClose }: ProductDetailMo
   const [userRating, setUserRating] = useState(0);
   const [ratingSubmitted, setRatingSubmitted] = useState(false);
   const [paperColors, setPaperColors] = useState<{ name: string; hex: string }[]>([]);
+  const { addToCart } = useCart();
 
   // Order form state
   const [showOrderForm, setShowOrderForm] = useState(false);
@@ -142,7 +131,7 @@ export default function ProductDetailModal({ product, onClose }: ProductDetailMo
       <div className="flex items-center gap-2 mb-4">
         {product.category && (
           <span className="bg-pink-100 text-pink-600 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-widest">
-            {product.category.name || product.category}
+            {typeof product.category === 'string' ? product.category : product.category.name}
           </span>
         )}
         <div className="flex items-center gap-1 text-yellow-500">
@@ -256,13 +245,24 @@ export default function ProductDetailModal({ product, onClose }: ProductDetailMo
           </button>
         </form>
       ) : (
-        <button
-          onClick={() => setShowOrderForm(true)}
-          className="w-full bg-gray-800 text-white font-medium py-4 rounded-xl shadow-xl shadow-gray-200 hover:bg-pink-600 hover:shadow-pink-200 transition-all duration-300 flex items-center justify-center gap-3 transform hover:-translate-y-1"
-        >
-          <MessageCircle size={20} />
-          <span>Cek Harga & Pesan via WhatsApp</span>
-        </button>
+        <div className="flex flex-col sm:flex-row gap-3">
+          <button
+            type="button"
+            onClick={() => addToCart(product, paperColor)}
+            className="flex-1 bg-pink-100 hover:bg-pink-200 text-pink-700 font-semibold py-3.5 px-4 rounded-xl transition-all duration-300 flex items-center justify-center gap-2 border border-pink-200 shadow-sm active:scale-95"
+          >
+            <ShoppingBag size={18} />
+            <span>+ Keranjang</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setShowOrderForm(true)}
+            className="flex-1 bg-gray-800 text-white font-medium py-3.5 px-4 rounded-xl shadow-lg shadow-gray-200 hover:bg-pink-600 hover:shadow-pink-200 transition-all duration-300 flex items-center justify-center gap-2 transform hover:-translate-y-0.5 active:scale-95 text-sm"
+          >
+            <MessageCircle size={18} />
+            <span>Pesan Langsung</span>
+          </button>
+        </div>
       )}
       </div>
     </div>

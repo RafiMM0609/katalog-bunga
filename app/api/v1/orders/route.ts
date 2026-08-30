@@ -7,9 +7,9 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
 
     // Validate required fields
-    if (!body.customer_name || !body.customer_phone || !body.product_id) {
+    if (!body.customer_name || !body.product_id) {
       return NextResponse.json(
-        { error: 'Missing required fields: customer_name, customer_phone, product_id' },
+        { error: 'Missing required fields: customer_name, product_id' },
         { status: 400 }
       );
     }
@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
       .from('orders')
       .insert({
         customer_name: body.customer_name,
-        customer_phone: body.customer_phone,
+        customer_phone: body.customer_phone || '-',
         customer_email: body.customer_email || null,
         product_id: body.product_id,
         selected_paper_color: body.selected_paper_color || null,
