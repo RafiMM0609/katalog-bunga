@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 import {
   ShoppingBag,
   Heart,
@@ -75,7 +76,7 @@ export default function CategoryGrid({
   }
 
   return (
-    <div className="flex flex-col items-center relative overflow-hidden">
+    <div className="flex flex-col items-center relative overflow-hidden py-4">
       {/* Throttled background animation isolated to prevent CategoryGrid re-renders */}
       <BackgroundFlowerAnimation />
 
@@ -86,31 +87,40 @@ export default function CategoryGrid({
       <div className="w-full flex gap-4 overflow-x-auto pb-4 md:pb-0 md:overflow-visible justify-start md:justify-center scrollbar-hide px-2 relative z-10">
         {categories.map((cat) => {
           const Icon = ICON_MAP[cat.icon_name] || Tag;
+          const isActive = activeCategory === cat.id;
+
           return (
-            <button
+            <motion.button
               key={cat.id}
               onClick={() => setActive(cat.id)}
-              className={`flex flex-col items-center gap-3 min-w-[80px] group transition-all duration-300 p-2 rounded-xl ${
-                activeCategory === cat.id ? "opacity-100 scale-105" : "opacity-60 hover:opacity-100"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className={`flex flex-col items-center gap-3 min-w-[80px] group transition-opacity duration-300 p-2 rounded-xl ${
+                isActive ? "opacity-100" : "opacity-60 hover:opacity-100"
               }`}
             >
               <div
-                className={`w-14 h-14 md:w-16 md:h-16 neumorphic-circle transition-all ${
-                  activeCategory === cat.id
+                className={`w-14 h-14 md:w-16 md:h-16 neumorphic-circle transition-all relative ${
+                  isActive
                     ? "neumorphic-active text-white bg-rose-500"
                     : "bg-white border border-pink-100 text-gray-400 group-hover:bg-pink-50"
                 }`}
               >
                 <Icon size={24} strokeWidth={1.5} />
+
+                {/* Active Indicator Backdrop */}
+                {isActive && (
+                  <motion.div
+                    layoutId="active-category"
+                    className="absolute inset-0 bg-rose-500 rounded-full -z-10"
+                    transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                  />
+                )}
               </div>
-              <span
-                className={`text-xs md:text-sm font-medium ${
-                  activeCategory === cat.id ? "text-pink-600" : "text-gray-500"
-                }`}
-              >
+              <span className={`text-xs md:text-sm font-medium ${isActive ? "text-pink-600" : "text-gray-500"}`}>
                 {cat.name}
               </span>
-            </button>
+            </motion.button>
           );
         })}
       </div>

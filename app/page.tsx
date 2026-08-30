@@ -9,7 +9,7 @@ export default async function HomePage() {
   ]);
 
   return (
-    <div className="space-y-10 animate-fade-in">
+    <div className="space-y-10">
       <HeroSection />
       <HomeClientWrapper
         initialCategories={initialCategories}

@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import ProductCard from "@/components/ui/ProductCard";
 import type { Product, PaginatedResponse } from "@/lib/types";
 
@@ -58,12 +59,16 @@ export default function ProductGrid({ filterCategory, initialProducts }: Props) 
   return (
     <div>
       <div className="flex justify-between items-end mb-6 px-2">
-        <div>
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5 }}
+        >
           <h3 className="font-serif text-2xl text-gray-800">Katalog Pilihan</h3>
           <p className="text-xs text-gray-400 mt-1">
             {loading ? 'Memuat...' : `Menampilkan ${products.length} dari ${total} produk`}
           </p>
-        </div>
+        </motion.div>
       </div>
 
       {loading ? (
@@ -73,19 +78,32 @@ export default function ProductGrid({ filterCategory, initialProducts }: Props) 
           ))}
         </div>
       ) : products.length === 0 ? (
-        <div className="text-center py-16 text-gray-400">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="text-center py-16 text-gray-400"
+        >
           <p className="text-lg">Belum ada produk di kategori ini</p>
-        </div>
+        </motion.div>
       ) : (
         <>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-8">
-            {products.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
+          <motion.div
+            layout
+            className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-8"
+          >
+            <AnimatePresence mode="popLayout">
+              {products.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </AnimatePresence>
+          </motion.div>
 
           {totalPages > 1 && (
-            <div className="flex justify-center gap-2 mt-10">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="flex justify-center gap-2 mt-10"
+            >
               <button
                 onClick={() => handlePageChange(page - 1)}
                 disabled={page === 1}
@@ -103,7 +121,7 @@ export default function ProductGrid({ filterCategory, initialProducts }: Props) 
               >
                 Selanjutnya →
               </button>
-            </div>
+            </motion.div>
           )}
         </>
       )}
