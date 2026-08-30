@@ -1,25 +1,24 @@
 import { notFound } from 'next/navigation';
-import { supabase } from '@/lib/supabase';
+import { getProductById, getAllProductIds } from '@/lib/data';
 import ProductDetailModal from '@/components/modals/ProductDetailModal';
 
-async function getProduct(id: string) {
-  const { data, error } = await supabase
-    .from('products')
-    .select('*, category:categories(*)')
-    .eq('id', id)
-    .single();
+export const revalidate = 60; // Enable ISR with 60-second revalidation
 
-  if (error || !data) {
-    notFound();
-  }
-
-  return data;
+export async function generateStaticParams() {
+  const products = await getAllProductIds();
+  return products.map((p) => ({
+    id: String(p.id),
+  }));
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
-    const product = await getProduct(id);
+    const product = await getProductById(id);
+
+    if (!product) {
+      return { title: 'Produk Tidak Ditemukan - Kagitacraft' };
+    }
     
     return {
       title: `${product.name} - Kagitacraft`,
@@ -33,7 +32,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
         }),
       },
     };
-  } catch (error) {
+  } catch {
     return {
       title: 'Produk Tidak Ditemukan - Kagitacraft',
     };
@@ -42,7 +41,12 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 
 export default async function ProductDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const product = await getProduct(id);
+  const product = await getProductById(id);
   
+  if (!product) {
+    notFound();
+  }
+
   return <ProductDetailModal product={product} />;
 }
+

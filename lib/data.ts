@@ -1,3 +1,4 @@
+import { cache } from 'react';
 import { supabase } from '@/lib/supabase';
 import type { Category, Product, PaginatedResponse } from '@/lib/types';
 import { paginationConfig } from '@/lib/config';
@@ -75,3 +76,40 @@ export async function getProducts(
     return { total: 0, page, per_page: perPage, total_pages: 1, data: [] };
   }
 }
+
+export const getProductById = cache(async (id: string): Promise<Product | null> => {
+  try {
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL) return null;
+
+    const { data, error } = await supabase
+      .from('products')
+      .select('*, category:categories(*)')
+      .eq('id', id)
+      .single();
+
+    if (error || !data) {
+      return null;
+    }
+    return data as Product;
+  } catch (err) {
+    console.error('getProductById exception:', err);
+    return null;
+  }
+});
+
+export const getAllProductIds = cache(async (): Promise<{ id: number | string }[]> => {
+  try {
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL) return [];
+
+    const { data, error } = await supabase
+      .from('products')
+      .select('id')
+      .eq('is_active', true);
+
+    if (error || !data) return [];
+    return data;
+  } catch (err) {
+    console.error('getAllProductIds exception:', err);
+    return [];
+  }
+});
